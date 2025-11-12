@@ -1,15 +1,31 @@
-Nonogram Game - Complete Rules & Mechanics Documentation
-1. What is Nonogram?
+# Nonogram Game - Complete Rules & Mechanics Documentation
 
-Nonogram (also known as Picross, Griddlers, or Picture Cross) is a picture logic puzzle where you fill cells in a grid according to numerical clues to reveal a hidden picture.
-Core Concept
+## Table of Contents
+1. [What is Nonogram?](#1-what-is-nonogram)
+2. [Game Rules in Detail](#2-game-rules-in-detail)
+3. [Game Mechanics](#3-game-mechanics)
+4. [Solving Strategies](#4-solving-strategies-for-players)
+5. [Puzzle Library Structure](#5-puzzle-library-structure)
+6. [Game Flow](#6-game-flow-diagram)
+7. [Detailed Game Features](#7-detailed-game-features)
+8. [Advanced Features](#8-advanced-features)
+9. [Error Handling & Edge Cases](#9-error-handling--edge-cases)
 
-    You have a blank grid (like graph paper)
-    Numbers on the edges tell you how many consecutive cells to fill in each row/column
-    When completed correctly, filled cells form a picture
+---
 
-Example of a Simple 5×5 Nonogram
+## 1. What is Nonogram?
 
+Nonogram (also known as **Picross**, **Griddlers**, or **Picture Cross**) is a picture logic puzzle where you fill cells in a grid according to numerical clues to reveal a hidden picture.
+
+### Core Concept
+
+- You have a blank grid (like graph paper)
+- Numbers on the edges tell you how many consecutive cells to fill in each row/column
+- When completed correctly, filled cells form a picture
+
+### Example of a Simple 5×5 Nonogram
+
+```
         2   1   3   1   2
       ┌───┬───┬───┬───┬───┐
     2 │ ■ │ ■ │   │   │   │  ← Row clue: 2 means "2 consecutive filled cells"
@@ -25,105 +41,124 @@ Example of a Simple 5×5 Nonogram
         ↑   ↑   ↑   ↑   ↑
       Col Col Col Col Col
       clues
+```
 
-This reveals the picture of a HEART ❤️
-2. Game Rules in Detail
-2.1 The Grid
-Grid Structure
+**Result:** This reveals the picture of a HEART ❤️
 
-    Square grid with N × N cells (typically 5×5, 10×10, 15×15, or 20×20)
-    Each cell can be in one of three states:
-        Empty/Unknown (white) - Not yet determined
-        Filled (black) - Player believes this should be filled
-        Marked with X (grey with X) - Player believes this should be empty
+---
+## 2. Game Rules in Detail
 
-Grid Sizes and Difficulty
+### 2.1 The Grid
 
-Grid Size	Difficulty	Time to Solve	Best For
-5×5	Easy	2-5 minutes	Beginners, quick games
-10×10	Medium	10-20 minutes	Regular players
-15×15	Hard	20-40 minutes	Experienced players
-20×20	Expert	40-90 minutes	Advanced puzzles
+#### Grid Structure
 
-2.2 Understanding Clues
-What Clues Represent
+- **Square grid** with N × N cells (typically 5×5, 10×10, 15×15, or 20×20)
+- Each cell can be in one of **three states**:
+  - **Empty/Unknown** (white) - Not yet determined
+  - **Filled** (black) - Player believes this should be filled  
+  - **Marked with X** (grey with X) - Player believes this should be empty
 
-Row Clues (Left side of grid):
+#### Grid Sizes and Difficulty
 
-    Numbers indicate groups of consecutive filled cells in that row
-    Numbers are listed from left to right
+| Grid Size | Difficulty | Time to Solve | Best For |
+|-----------|------------|---------------|----------|
+| **5×5**   | Easy       | 2-5 minutes   | Beginners, quick games |
+| **10×10** | Medium     | 10-20 minutes | Regular players |
+| **15×15** | Hard       | 20-40 minutes | Experienced players |
+| **20×20** | Expert     | 40-90 minutes | Advanced puzzles |
 
-Column Clues (Top of grid):
+### 2.2 Understanding Clues
 
-    Numbers indicate groups of consecutive filled cells in that column
-    Numbers are listed from top to bottom
+#### What Clues Represent
 
-Clue Examples
+**Row Clues (Left side of grid):**
+- Numbers indicate groups of consecutive filled cells in that row
+- Numbers are listed from left to right
 
-Example 1: Single Number
+**Column Clues (Top of grid):**
+- Numbers indicate groups of consecutive filled cells in that column  
+- Numbers are listed from top to bottom
 
-Row clue: 3
+#### Clue Examples
 
-Possible solutions for a 5-cell row:
-■ ■ ■ □ □  ✓
-□ ■ ■ ■ □  ✓
-□ □ ■ ■ ■  ✓
-■ ■ □ ■ □  ✗ (not consecutive)
+##### Example 1: Single Number
 
-Example 2: Multiple Numbers
-
-Row clue: 2 1
+**Row clue:** `3`
 
 Possible solutions for a 5-cell row:
-■ ■ □ ■ □  ✓ (2 filled, gap, 1 filled)
-■ ■ □ □ ■  ✓ (2 filled, gaps, 1 filled)
-□ ■ ■ □ ■  ✓ (gap, 2 filled, gap, 1 filled)
-■ ■ ■ □ □  ✗ (3 consecutive, not 2 and 1)
-■ ■ ■ □ ■  ✗ (3 consecutive, not 2 and 1)
+```
+■ ■ ■ □ □  ✓ Valid
+□ ■ ■ ■ □  ✓ Valid  
+□ □ ■ ■ ■  ✓ Valid
+■ ■ □ ■ □  ✗ Invalid (not consecutive)
+```
 
-Example 3: Zero (All Empty)
+##### Example 2: Multiple Numbers
 
-Row clue: 0  OR  (no numbers shown)
+**Row clue:** `2 1`
+
+Possible solutions for a 5-cell row:
+```
+■ ■ □ ■ □  ✓ Valid (2 filled, gap, 1 filled)
+■ ■ □ □ ■  ✓ Valid (2 filled, gaps, 1 filled)
+□ ■ ■ □ ■  ✓ Valid (gap, 2 filled, gap, 1 filled)
+■ ■ ■ □ □  ✗ Invalid (3 consecutive, not 2 and 1)
+■ ■ ■ □ ■  ✗ Invalid (3 consecutive, not 2 and 1)
+```
+
+##### Example 3: Zero (All Empty)
+
+**Row clue:** `0` OR (no numbers shown)
 
 Only solution for any row:
-□ □ □ □ □  ✓ (all cells empty)
+```
+□ □ □ □ □  ✓ Valid (all cells empty)
+```
 
-Example 4: Complete Fill
+##### Example 4: Complete Fill
 
-Row clue: 5  (for a 5-cell row)
+**Row clue:** `5` (for a 5-cell row)
 
 Only solution:
-■ ■ ■ ■ ■  ✓ (entire row filled)
+```
+■ ■ ■ ■ ■  ✓ Valid (entire row filled)
+```
 
-Critical Clue Rules
+#### Critical Clue Rules
 
-    Minimum Gap Rule
-        Between different number groups, there MUST be at least 1 empty cell
-        Example: "2 3" means 2 filled, at least 1 empty, then 3 filled
-    Order Rule
-        Numbers appear in the order the groups appear
-        "2 1" means the group of 2 comes before the group of 1
-    Complete Coverage Rule
-        All filled cells in a row/column must be accounted for in the clues
-        No extra filled cells allowed
-    Multiple Solutions Check
-        Clues must lead to ONLY ONE correct solution
-        Good puzzle design ensures uniqueness
+1. **Minimum Gap Rule**
+   - Between different number groups, there MUST be at least 1 empty cell
+   - Example: "2 3" means 2 filled, at least 1 empty, then 3 filled
 
-2.3 How Clues Are Generated
-Algorithm: From Picture to Clues
+2. **Order Rule**
+   - Numbers appear in the order the groups appear
+   - "2 1" means the group of 2 comes before the group of 1
+
+3. **Complete Coverage Rule**
+   - All filled cells in a row/column must be accounted for in the clues
+   - No extra filled cells allowed
+
+4. **Multiple Solutions Check**
+   - Clues must lead to ONLY ONE correct solution
+   - Good puzzle design ensures uniqueness
+
+### 2.3 How Clues Are Generated
+
+#### Algorithm: From Picture to Clues
 
 Let's say we have this 5×5 picture (solution):
 
+```
 Row 0:  ■ ■ □ □ □
 Row 1:  ■ □ ■ ■ □
 Row 2:  ■ ■ ■ □ □
 Row 3:  □ □ ■ □ □
 Row 4:  ■ ■ □ ■ □
+```
 
-Step 1: Generate Row Clues
-java
+#### Step 1: Generate Row Clues
 
+```java
 For each row:
     count = 0
     clues = []
@@ -144,6 +179,7 @@ For each row:
 ```
 
 **Applying to our picture:**
+
 ```
 Row 0: ■ ■ □ □ □ → Clue: 2
        (2 consecutive, then empty)
@@ -161,9 +197,10 @@ Row 4: ■ ■ □ ■ □ → Clue: 2 1
        (2 filled, empty, 1 filled)
 ```
 
-**Step 2: Generate Column Clues**
+#### Step 2: Generate Column Clues
 
 Same algorithm, but process columns vertically:
+
 ```
 Col 0:  Col 1:  Col 2:  Col 3:  Col 4:
   ■       ■       □       □       □
@@ -176,7 +213,8 @@ Clue:   Clue:   Clue:   Clue:   Clue:
 3 1     2 1     3       1 1     0
 ```
 
-**Final Clue Display:**
+#### Final Clue Display:
+
 ```
         3   2   3   1   0
         1   1       1
@@ -195,59 +233,56 @@ Clue:   Clue:   Clue:   Clue:   Clue:
 
 ---
 
-### **2.4 Player Interactions**
+### 2.4 Player Interactions
 
-#### **Cell States and Actions**
+#### Cell States and Actions
 
 **State 1: Unknown (Initial)**
-- Appearance: White/Empty cell
-- Meaning: Player hasn't decided yet
-- Action: Click to fill
+- **Appearance:** White/Empty cell
+- **Meaning:** Player hasn't decided yet
+- **Action:** Click to fill
 
 **State 2: Filled**
-- Appearance: Black/Dark cell
-- Meaning: Player believes this cell should be filled
-- Action: Click again to mark as empty
+- **Appearance:** Black/Dark cell
+- **Meaning:** Player believes this cell should be filled
+- **Action:** Click again to mark as empty
 
 **State 3: Marked as Empty (X)**
-- Appearance: Grey cell with red X
-- Meaning: Player is certain this cell should remain empty
-- Action: Click again to return to unknown
+- **Appearance:** Grey cell with red X
+- **Meaning:** Player is certain this cell should remain empty
+- **Action:** Click again to return to unknown
 
-#### **Click Cycle**
+#### Click Cycle
 ```
 Unknown (□) → Left Click → Filled (■) → Left Click → Marked (X) → Left Click → Unknown (□)
      ↑                                                                                ↓
      └────────────────────────────────────────────────────────────────────────────────┘
+```
 
-Mouse Controls
+#### Mouse Controls
 
-Left Click:
+**Left Click:**
+- On Unknown cell → Fill it (make it black)
+- On Filled cell → Mark it with X (grey with X)
+- On Marked cell → Clear it (back to unknown)
 
-    On Unknown cell → Fill it (make it black)
-    On Filled cell → Mark it with X (grey with X)
-    On Marked cell → Clear it (back to unknown)
+**Right Click (Alternative control):**
+- Directly toggle between Unknown and Marked
+- Skip the Filled state
 
-Right Click (Alternative control):
+**Drag to Fill (Advanced):**
+- Hold left button and drag → Fill multiple cells
+- Useful for filling obvious consecutive cells
 
-    Directly toggle between Unknown and Marked
-    Skip the Filled state
+### 2.5 Winning Conditions
 
-Drag to Fill (Advanced):
+#### Puzzle is Solved When:
+- All filled cells match the solution exactly
+- All marked cells correctly identify empty cells  
+- No cells are in wrong state
 
-    Hold left button and drag → Fill multiple cells
-    Useful for filling obvious consecutive cells
-
-2.5 Winning Conditions
-Puzzle is Solved When:
-
-    All filled cells match the solution exactly
-    All marked cells correctly identify empty cells
-    No cells are in wrong state
-
-Validation Check
-java
-
+#### Validation Check
+```java
 For each cell in grid:
     if cell.playerState == FILLED:
         if cell.actualValue != TRUE:
@@ -260,7 +295,7 @@ For each cell in grid:
 return SOLVED
 ```
 
-#### **Completion States**
+#### Completion States
 
 **Fully Correct:**
 ```
@@ -285,13 +320,11 @@ Result: "Keep trying! X% complete"
 Result: "There are errors. Check your work!"
 ```
 
----
+## 3. Game Mechanics
 
-## **3. Game Mechanics**
+### 3.1 Starting a New Game
 
-### **3.1 Starting a New Game**
-
-#### **Step 1: Choose Difficulty**
+#### Step 1: Choose Difficulty
 ```
 Easy (5×5):     [Select]
   - 25 cells
@@ -307,22 +340,22 @@ Hard (15×15):   [Select]
   - 225 cells
   - Complex patterns
   - 30-60 minute solve time
+```
 
-Step 2: Puzzle Loading
+#### Step 2: Puzzle Loading
 
-Option A: Random from Library
-java
-
+**Option A: Random from Library**
+```java
 puzzleLibrary.selectRandom(difficulty)
+```
 
-Option B: Specific Puzzle
-java
-
+**Option B: Specific Puzzle**
+```java
 puzzleLibrary.loadPuzzle("EASY_HEART")
+```
 
-Step 3: Initialize Game State
-java
-
+#### Step 3: Initialize Game State
+```java
 1. Create empty grid (all cells UNKNOWN)
 2. Generate clues from solution
 3. Hide actual solution from player
@@ -331,11 +364,9 @@ java
 6. Clear undo stack
 ```
 
----
+### 3.2 During Gameplay
 
-### **3.2 During Gameplay**
-
-#### **Information Display**
+#### Information Display
 
 **Top Panel:**
 ```
@@ -345,28 +376,26 @@ java
 │ Completion: 67%                     │
 │ [Undo] [Redo] [Hint] [Check]      │
 └─────────────────────────────────────┘
+```
 
-Timer:
+**Timer:**
+- Starts when first cell is clicked
+- Pauses when hint is shown
+- Stops when puzzle is solved
 
-    Starts when first cell is clicked
-    Pauses when hint is shown
-    Stops when puzzle is solved
+**Move Counter:**
+- Increments on every cell click
+- Used to track efficiency
+- Lower is better
 
-Move Counter:
-
-    Increments on every cell click
-    Used to track efficiency
-    Lower is better
-
-Completion Percentage:
-java
-
+**Completion Percentage:**
+```java
 correctCells = count of cells matching solution
 totalCells = rows × cols
 percentage = (correctCells / totalCells) × 100
 ```
 
-#### **Visual Feedback**
+#### Visual Feedback
 
 **Clue Highlighting (Advanced Feature):**
 ```
@@ -392,17 +421,15 @@ Row/Column Complete:
 ✓ Slight celebration animation
 ```
 
----
+### 3.3 Hint System
 
-### **3.3 Hint System**
-
-#### **How Hints Work**
+#### How Hints Work
 
 The hint system analyzes the current board state and provides strategic guidance WITHOUT directly showing the solution.
 
-#### **Hint Types**
+#### Hint Types
 
-**Type 1: Obvious Rows/Columns**
+##### Type 1: Obvious Rows/Columns
 ```
 Hint: "Row 3 can be completely filled!"
 
@@ -412,7 +439,7 @@ Explanation:
   Solution: Must fill entire row
 ```
 
-**Type 2: Edge Deduction**
+##### Type 2: Edge Deduction
 ```
 Hint: "Look at Column 5. The clue is 8, so some cells MUST be filled."
 
@@ -427,7 +454,7 @@ Explanation:
        ↑_______↑
 ```
 
-**Type 3: Elimination**
+##### Type 3: Elimination
 ```
 Hint: "In Row 2, cells 7-10 cannot be filled."
 
@@ -437,7 +464,7 @@ Explanation:
   Clue satisfied, remaining cells must be empty
 ```
 
-**Type 4: Contradiction Detection**
+##### Type 4: Contradiction Detection
 ```
 Hint: "Column 4 has an error. Check your filled cells."
 
@@ -447,17 +474,17 @@ Explanation:
   This creates a contradiction
 ```
 
-**Type 5: Starting Strategy**
+##### Type 5: Starting Strategy
 ```
 Hint: "Start with Row 1 - it has the largest number."
 
 Explanation:
   Row 1 clue: 9 (in 10-cell row)
   This is easy to place and eliminates many possibilities
+```
 
-Hint Generation Algorithm
-java
-
+#### Hint Generation Algorithm
+```java
 Queue<Hint> generateHints() {
     Queue<Hint> hints = new MyQueue<>();
     
@@ -667,13 +694,11 @@ If confirmed:
      "Status: Gave Up"
 ```
 
----
+## 4. Solving Strategies (For Players)
 
-## **4. Solving Strategies (For Players)**
+### 4.1 Basic Strategies
 
-### **4.1 Basic Strategies**
-
-#### **Strategy 1: Start with Large Numbers**
+#### Strategy 1: Start with Large Numbers
 ```
 Example: 10-cell row with clue "9"
 
@@ -694,7 +719,7 @@ If clue number > half of row/column length:
   → Start here first!
 ```
 
-#### **Strategy 2: Complete Rows/Columns**
+#### Strategy 2: Complete Rows/Columns
 ```
 If clue sum == row length:
   → Fill entire row
@@ -725,7 +750,7 @@ Example: 10-cell row with clue "3 2 5"
      ■ ■ ■ □ ■ ■ □ ■ ■ ■
 ```
 
-#### **Strategy 3: Edge Deduction**
+#### Strategy 3: Edge Deduction
 ```
 10-cell row with clue "7"
 
@@ -751,7 +776,7 @@ Overlap starts at: L - N + 1
 Overlap ends at:   N
 ```
 
-#### **Strategy 4: Mark Impossible Cells**
+#### Strategy 4: Mark Impossible Cells
 ```
 10-cell row with clue "3"
 Already filled: cells 1-3
@@ -763,11 +788,9 @@ Current state: ■ ■ ■ □ □ □ □ □ □ □
 Mark with X: ■ ■ ■ X X X X X X X
 ```
 
----
+### 4.2 Advanced Strategies
 
-### **4.2 Advanced Strategies**
-
-#### **Strategy 5: Cross-Referencing**
+#### Strategy 5: Cross-Referencing
 ```
 Grid state:
      C1  C2  C3  C4  C5
@@ -792,7 +815,7 @@ R4   □   X   □   □   □
 R5   □   X   □   □   □
 ```
 
-#### **Strategy 6: Split Analysis**
+#### Strategy 6: Split Analysis
 ```
 10-cell row with clue "2 2"
 
@@ -812,7 +835,7 @@ Result:
 ? ? ? ? ? ? ? ? □ □  (Cells 9-10 never filled)
 ```
 
-#### **Strategy 7: Recursive Solving**
+#### Strategy 7: Recursive Solving
 ```
 Row clue: 3 2
 
@@ -829,11 +852,11 @@ Step 3: Recurse until valid arrangement found
 
 ---
 
-## **5. Puzzle Library Structure**
+## 5. Puzzle Library Structure
 
-### **5.1 Puzzle Categories**
+### 5.1 Puzzle Categories
 
-#### **By Difficulty**
+#### By Difficulty
 ```
 EASY (5×5):
 ├── EASY_HEART
@@ -863,7 +886,7 @@ EXPERT (20×20):
 └── EXPERT_GEOMETRIC
 ```
 
-#### **By Theme**
+#### By Theme
 ```
 ANIMALS:
 - Cat, Dog, Fish, Bird, Butterfly, Dragon
