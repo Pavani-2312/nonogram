@@ -26,11 +26,13 @@ Nonogram (also known as **Picross**, **Griddlers**, or **Picture Cross**) is a p
 ### Example of a Simple 5×5 Nonogram
 
 ```
-        2   1   3   1   2
+            1
+        3   1       1
+        1   1   2   1   1
       ┌───┬───┬───┬───┬───┐
     2 │ ■ │ ■ │   │   │   │  ← Row clue: 2 means "2 consecutive filled cells"
       ├───┼───┼───┼───┼───┤
-  1 1 │ ■ │   │   │ ■ │   │  ← Row clue: 1 1 means "1 filled, gap, 1 filled"
+  1 2 │ ■ │   │   │ ■ │ ■ │  ← Row clue: 1 1 means "1 filled, gap, 1 filled"
       ├───┼───┼───┼───┼───┤
     3 │ ■ │ ■ │ ■ │   │   │  ← Row clue: 3 means "3 consecutive filled cells"
       ├───┼───┼───┼───┼───┤
@@ -43,7 +45,7 @@ Nonogram (also known as **Picross**, **Griddlers**, or **Picture Cross**) is a p
       clues
 ```
 
-**Result:** This reveals the picture of a HEART ❤️
+**Result:** This reveals the picture 
 
 ---
 ## 2. Game Rules in Detail
@@ -60,12 +62,12 @@ Nonogram (also known as **Picross**, **Griddlers**, or **Picture Cross**) is a p
 
 #### Grid Sizes and Difficulty
 
-| Grid Size | Difficulty | Time to Solve | Best For |
-|-----------|------------|---------------|----------|
-| **5×5**   | Easy       | 2-5 minutes   | Beginners, quick games |
-| **10×10** | Medium     | 10-20 minutes | Regular players |
-| **15×15** | Hard       | 20-40 minutes | Experienced players |
-| **20×20** | Expert     | 40-90 minutes | Advanced puzzles |
+| Grid Size | Difficulty |
+|-----------|------------|
+| **5×5**   | Easy       |
+| **10×10** | Medium     |
+| **15×15** | Hard       |
+| **20×20** | Expert     |
 
 ### 2.2 Understanding Clues
 
@@ -140,7 +142,6 @@ Only solution:
 
 4. **Multiple Solutions Check**
    - Clues must lead to ONLY ONE correct solution
-   - Good puzzle design ensures uniqueness
 
 ### 2.3 How Clues Are Generated
 
@@ -245,12 +246,10 @@ Clue:   Clue:   Clue:   Clue:   Clue:
 **State 2: Filled**
 - **Appearance:** Black/Dark cell
 - **Meaning:** Player believes this cell should be filled
-- **Action:** Click again to mark as empty
 
 **State 3: Marked as Empty (X)**
 - **Appearance:** Grey cell with red X
 - **Meaning:** Player is certain this cell should remain empty
-- **Action:** Click again to return to unknown
 
 #### Click Cycle
 ```
@@ -274,71 +273,51 @@ Unknown (□) → Left Click → Filled (■) → Left Click → Marked (X) → 
 - Hold left button and drag → Fill multiple cells
 - Useful for filling obvious consecutive cells
 
-### 2.5 Validation System & Error Handling
+### 2.5 Winning Conditions
 
-#### Real-Time Solution Validation
-The game continuously compares player choices against the predetermined solution to provide immediate feedback and enforce game rules. Each cell placement is instantly validated against the correct answer stored in memory.
+#### Puzzle is Solved When:
+- All filled cells match the solution exactly
+- All marked cells correctly identify empty cells  
+- No cells are in wrong state
 
-#### Solution Comparison Process
-When a player clicks a cell, the system checks whether the new state matches what should actually be in that position:
-- If player fills a cell that should be empty → Error detected
-- If player marks a cell that should be filled → Error detected  
-- If player's choice matches the solution → Valid move accepted
+#### Validation Check
+```java
+For each cell in grid:
+    if cell.playerState == FILLED:
+        if cell.actualValue != TRUE:
+            return INCORRECT
+    
+    if cell.playerState == MARKED:
+        if cell.actualValue != FALSE:
+            return INCORRECT
 
-#### Three-Strike Error System
+return SOLVED
+```
 
-**Error Tracking Mechanism:**
-Players begin each puzzle with exactly 3 allowed mistakes. The system maintains an error counter that increments with each incorrect cell placement. Upon reaching the 4th error, the game terminates immediately.
+#### Completion States
 
-**Error Classification:**
-The system distinguishes between actual errors and acceptable actions:
+**Fully Correct:**
+```
+✓ All filled cells correct
+✓ All marked cells correct
+✓ No unknown cells remaining (optional)
+Result: "Puzzle Solved! 🎉"
+```
 
-**Counted as Errors:**
-- Filling a cell black when it should remain empty
-- Marking a cell with X when it should be filled black
+**Partially Correct:**
+```
+✓ Some cells correct
+✗ Some cells wrong
+✗ Some cells unknown
+Result: "Keep trying! X% complete"
+```
 
-**Not Counted as Errors:**
-- Changing an unknown cell to the correct state
-- Reverting an incorrect cell back to unknown
-- Using the undo function to correct mistakes
-- Clicking the same cell multiple times without changing state
-
-**Progressive Warning System:**
-The game provides escalating feedback as errors accumulate:
-
-**First Error Response:**
-- Cell briefly flashes red to indicate mistake
-- Error counter displays "Errors: 1/3"
-- Subtle warning sound plays
-- Game continues normally
-
-**Second Error Response:**
-- Red flash animation on incorrect cell
-- Counter shows "Errors: 2/3" with yellow warning color
-- System displays cautionary message about remaining chances
-
-**Third Error Response:**
-- Prominent red flash on cell
-- Counter displays "Errors: 3/3" in critical red color
-- Final warning appears: "One more error will end the game"
-- Interface elements briefly pulse red for emphasis
-
-**Fourth Error (Game Termination):**
-- Immediate game over upon error detection
-- All player interactions disabled instantly
-- Timer stops at current time
-- Game over screen appears with final statistics
-
-#### Game Completion Conditions
-
-**Victory Requirements:**
-The puzzle is considered solved when all cells match their intended solution state and the error limit hasn't been exceeded. The system verifies that every cell requiring a fill is marked as filled, while ensuring no incorrect fills exist.
-
-**Defeat Condition:**
-The game ends in failure when the player makes their fourth error, regardless of puzzle completion percentage. This creates a strategic element where players must balance speed with accuracy.
-
-**End Game Statistics:**
-Upon completion (victory or defeat), the system presents comprehensive performance metrics including time elapsed, total moves made, error count, completion percentage, and calculated score based on efficiency and accuracy.
+**Has Errors:**
+```
+✗ Wrong filled cells
+✗ Wrong marked cells
+Result: "There are errors. Check your work!"
+```
 
 ## 3. Game Mechanics
 
@@ -445,44 +424,93 @@ Row/Column Complete:
 
 #### How Hints Work
 
-The hint system analyzes the current board state and provides strategic guidance without directly revealing the solution. It employs logical deduction algorithms to identify cells that can be determined with certainty based on current information.
+The hint system analyzes the current board state and provides strategic guidance WITHOUT directly showing the solution.
 
-#### Hint Generation Strategy
+#### Hint Types
 
-The system prioritizes hints based on solving efficiency and learning value:
+##### Type 1: Obvious Rows/Columns
+```
+Hint: "Row 3 can be completely filled!"
 
-**Priority Level 1: Immediate Certainties**
-The system first identifies rows or columns where clues can be satisfied in only one way given the current grid state. These represent the most valuable hints as they provide definitive answers.
+Explanation:
+  Clue: 10 (for 10-cell row)
+  Current: □ □ □ □ □ □ □ □ □ □
+  Solution: Must fill entire row
+```
 
-**Priority Level 2: Overlap Analysis**  
-For clues with large numbers relative to row/column length, the system calculates positional overlaps. When a clue is large enough, certain cells must be filled regardless of the exact positioning of the consecutive block.
+##### Type 2: Edge Deduction
+```
+Hint: "Look at Column 5. The clue is 8, so some cells MUST be filled."
 
-**Priority Level 3: Elimination Logic**
-The system identifies cells that cannot possibly be filled based on already-satisfied clues or spatial constraints. These elimination hints help players mark cells with confidence.
+Explanation:
+  10-cell column, clue is 8
+  Even with maximum shifting:
+  ■ ■ ■ ■ ■ ■ ■ ■ □ □  (left-aligned)
+  □ □ ■ ■ ■ ■ ■ ■ ■ ■  (right-aligned)
+  
+  Overlap:
+  □ □ ■ ■ ■ ■ ■ ■ □ □  (these MUST be filled)
+       ↑_______↑
+```
 
-**Priority Level 4: Cross-Reference Opportunities**
-Advanced hints analyze the interaction between row and column constraints, identifying cells where both horizontal and vertical clues provide converging evidence.
+##### Type 3: Elimination
+```
+Hint: "In Row 2, cells 7-10 cannot be filled."
 
-**Priority Level 5: Error Detection**
-The system can identify contradictions in the current grid state, alerting players to mistakes that violate the fundamental rules of nonogram solving.
+Explanation:
+  Clue: 3
+  Already filled: cells 1-3
+  Clue satisfied, remaining cells must be empty
+```
 
-#### Hint Delivery Methods
+##### Type 4: Contradiction Detection
+```
+Hint: "Column 4 has an error. Check your filled cells."
 
-**Textual Guidance:**
-Hints are presented as natural language explanations that teach solving techniques rather than simply providing answers. This educational approach helps players develop independent solving skills.
+Explanation:
+  Clue requires: 2 1 (2 filled, gap, 1 filled)
+  Current state has: 3 consecutive filled
+  This creates a contradiction
+```
 
-**Visual Highlighting:**
-When appropriate, hints can include visual emphasis on relevant grid areas, helping players understand the spatial relationships being discussed.
+##### Type 5: Starting Strategy
+```
+Hint: "Start with Row 1 - it has the largest number."
 
-**Progressive Disclosure:**
-The system can provide increasingly specific guidance, starting with general strategy suggestions and progressing to more detailed analysis if needed.
+Explanation:
+  Row 1 clue: 9 (in 10-cell row)
+  This is easy to place and eliminates many possibilities
+```
 
-#### Hint Cost Mechanism
-
-To maintain challenge integrity, the hint system implements usage limitations:
-- Initial hints may be provided freely to encourage learning
-- Subsequent hints incur penalties to final scoring or timing
-- The cost structure encourages strategic hint usage rather than over-reliance
+#### Hint Generation Algorithm
+```java
+Queue<Hint> generateHints() {
+    Queue<Hint> hints = new MyQueue<>();
+    
+    // Priority 1: Check for complete rows/columns
+    for each row:
+        if clueSum == rowLength:
+            hints.add("Row " + i + " should be completely filled")
+    
+    // Priority 2: Check for edge deductions
+    for each row:
+        overlap = calculateOverlap(row)
+        if overlap.size() > 0:
+            hints.add("Row " + i + " has " + overlap.size() + " cells that must be filled")
+    
+    // Priority 3: Check for contradictions
+    for each row:
+        if hasContradiction(row):
+            hints.add("Row " + i + " has errors. Check clue: " + getClue(row))
+    
+    // Priority 4: Suggest starting point
+    if board.isEmpty():
+        largestClue = findLargestClue()
+        hints.add("Start with " + largestClue.location + " - it has the biggest number")
+    
+    return hints
+}
+```
 
 #### **Hint Delivery**
 
@@ -823,101 +851,141 @@ Step 3: Recurse until valid arrangement found
 
 ---
 
-## 5. Puzzle Library Structure & Generation
+## 5. Puzzle Library Structure
 
-### 5.1 Dual Puzzle System
+### 5.1 Puzzle Categories
 
-The game employs a hybrid approach combining pre-designed puzzles with dynamic generation capabilities.
+#### By Difficulty
+```
+EASY (5×5):
+├── EASY_HEART
+├── EASY_CROSS
+├── EASY_SMILE
+├── EASY_STAR
+└── EASY_HOUSE
 
-#### Fixed Puzzle Collection
-A curated library contains hand-crafted puzzles designed for optimal solving experience:
+MEDIUM (10×10):
+├── MEDIUM_TREE
+├── MEDIUM_CAT
+├── MEDIUM_FISH
+├── MEDIUM_FLOWER
+└── MEDIUM_BUTTERFLY
 
-**Easy Puzzles (5×5 grids):**
-- Simple recognizable shapes (heart, star, cross)
-- Clear, unambiguous clue patterns
-- Designed for learning basic solving techniques
-- Guaranteed unique solutions with minimal complexity
+HARD (15×15):
+├── HARD_DRAGON
+├── HARD_CASTLE
+├── HARD_PORTRAIT
+├── HARD_LANDSCAPE
+└── HARD_ABSTRACT
 
-**Medium Puzzles (10×10 grids):**
-- More detailed images (tree, cat, flower)
-- Multiple solving strategies required
-- Balanced difficulty progression
-- Intermediate pattern recognition challenges
+EXPERT (20×20):
+├── EXPERT_DETAILED_FACE
+├── EXPERT_CITYSCAPE
+├── EXPERT_ANIMAL
+└── EXPERT_GEOMETRIC
+```
 
-**Hard Puzzles (15×15 grids):**
-- Complex artistic designs
-- Advanced logical deduction required
-- Multiple interconnected solving paths
-- High-detail imagery when completed
+#### By Theme
+```
+ANIMALS:
+- Cat, Dog, Fish, Bird, Butterfly, Dragon
 
-**Expert Puzzles (20×20 grids):**
-- Intricate detailed artwork
-- Master-level solving techniques needed
-- Extended solving sessions (45+ minutes)
-- Professional-quality final images
+NATURE:
+- Tree, Flower, Mountain, Sun, Cloud
 
-#### Dynamic Puzzle Generation
+OBJECTS:
+- House, Car, Cup, Key, Heart
 
-**Random Grid Creation Process:**
-The system generates new puzzles by creating random filled patterns and deriving clues mathematically:
+SYMBOLS:
+- Cross, Star, Arrow, Checkmark
 
-1. **Pattern Generation:** Random placement of filled cells following aesthetic guidelines
-2. **Clue Derivation:** Automatic calculation of row and column number sequences
-3. **Solution Validation:** Verification that generated clues produce unique solutions
-4. **Difficulty Assessment:** Analysis of solving complexity and required techniques
-
-**Clue Generation Algorithm:**
-For each completed grid pattern, the system analyzes consecutive filled cells:
-- Scans each row left-to-right counting consecutive filled blocks
-- Scans each column top-to-bottom counting consecutive filled blocks  
-- Generates number sequences representing these consecutive groups
-- Ensures minimum gaps between groups for valid puzzle structure
-
-**Quality Assurance Process:**
-Generated puzzles undergo automated testing:
-- Unique solution verification using constraint satisfaction
-- Difficulty rating based on required solving techniques
-- Aesthetic evaluation of final revealed image
-- Rejection of trivial or overly complex patterns
-
-### 5.2 Puzzle Storage & Access
-
-#### Memory-Based Storage
-New randomly generated puzzles exist only during active gameplay sessions. They are not permanently stored, ensuring fresh challenges while maintaining system efficiency.
-
-#### Fixed Puzzle Persistence
-Pre-designed puzzles are stored in structured data files containing:
-- Grid solution patterns
-- Pre-calculated clue sequences
-- Metadata (difficulty, theme, estimated solve time)
-- Quality ratings and player feedback integration
-
-#### Selection Mechanism
-Players can choose between:
-- **Specific Selection:** Browse and select from the fixed puzzle library
-- **Random Selection:** System automatically chooses from appropriate difficulty level
-- **Generated Challenge:** Request a newly created random puzzle
-- **Progressive Mode:** Systematic advancement through increasing difficulty levels
+SEASONAL:
+- Christmas Tree, Pumpkin, Snowflake
+```
 
 ---
 
-### 5.3 Clue Generation Process
+### **5.2 Puzzle Storage Format**
 
-#### Mathematical Derivation from Solution Grid
+#### **Text File Format** (puzzles.txt)
+```
+PUZZLE_ID=EASY_HEART
+NAME=Heart Shape
+DIFFICULTY=EASY
+SIZE=5
+AUTHOR=System
+DESCRIPTION=A simple heart shape
+GRID=
+01100
+11111
+11111
+01110
+00100
+END
 
-The system automatically generates row and column clues by analyzing the completed puzzle solution through systematic scanning algorithms.
+PUZZLE_ID=MEDIUM_TREE
+NAME=Christmas Tree
+DIFFICULTY=MEDIUM
+SIZE=10
+AUTHOR=System
+DESCRIPTION=A festive Christmas tree
+GRID=
+0000110000
+0001111000
+0011111100
+0111111110
+0001111000
+0011111100
+0111111110
+1111111111
+0001111000
+0000110000
+END
 
-**Row Analysis Process:**
-Each horizontal row is examined from left to right, identifying consecutive sequences of filled cells. The system counts each unbroken chain of filled cells and records the length. When an empty cell interrupts a sequence, the current count is stored and a new count begins for the next filled sequence.
+Loading Algorithm
+java
 
-**Column Analysis Process:**  
-Similarly, each vertical column is scanned from top to bottom using the same consecutive-counting methodology. This ensures that clues accurately represent the vertical patterns that players must deduce.
-
-**Clue Sequence Formation:**
-The resulting number sequences become the clues displayed to players. For example, if a row contains two separate groups of filled cells - one with 3 consecutive cells and another with 2 consecutive cells - the clue becomes "3 2".
-
-**Validation and Quality Control:**
-Generated clues undergo verification to ensure they produce exactly one valid solution. The system employs constraint satisfaction algorithms to confirm that the clue combinations lead to a unique grid configuration, preventing ambiguous puzzles that could frustrate players.
+public boolean[][] loadPuzzleFromFile(String puzzleId) {
+    File file = new File("puzzles.txt");
+    BufferedReader reader = new BufferedReader(new FileReader(file));
+    
+    String line;
+    boolean foundPuzzle = false;
+    MyArrayList<String> gridLines = new MyArrayList<>();
+    int size = 0;
+    
+    while ((line = reader.readLine()) != null) {
+        if (line.startsWith("PUZZLE_ID=") && line.endsWith(puzzleId)) {
+            foundPuzzle = true;
+        }
+        
+        if (foundPuzzle) {
+            if (line.startsWith("SIZE=")) {
+                size = Integer.parseInt(line.substring(5));
+            }
+            
+            if (line.startsWith("GRID=")) {
+                // Next 'size' lines contain the grid
+                for (int i = 0; i < size; i++) {
+                    gridLines.add(reader.readLine());
+                }
+                break;
+            }
+        }
+    }
+    
+    // Convert to boolean array
+    boolean[][] grid = new boolean[size][size];
+    for (int i = 0; i < size; i++) {
+        String row = gridLines.get(i);
+        for (int j = 0; j < size; j++) {
+            grid[i][j] = (row.charAt(j) == '1');
+        }
+    }
+    
+    reader.close();
+    return grid;
+}
 
 6. Game Flow Diagram
 
@@ -1966,5 +2034,3 @@ Solution:
 Code:
   long lastClickTime = 0;
   static final long DEBOUN
-
-
