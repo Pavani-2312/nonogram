@@ -8,7 +8,7 @@ import nonogram.datastructures.MyLinkedList;
 public class CluePanel extends JPanel {
     private GameBoard board;
     private boolean isRowClues;
-    private static final int CELL_SIZE = 30;
+    private static final int CELL_SIZE = 50;
     
     public CluePanel(GameBoard board, boolean isRowClues) {
         this.board = board;

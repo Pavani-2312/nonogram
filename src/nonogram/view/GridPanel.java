@@ -12,7 +12,7 @@ import nonogram.model.CellState;
 public class GridPanel extends JPanel {
     private GameBoard board;
     private GameController controller;
-    private static final int CELL_SIZE = 30;
+    private static final int CELL_SIZE = 50;
     
     public GridPanel(GameBoard board, GameController controller) {
         this.board = board;

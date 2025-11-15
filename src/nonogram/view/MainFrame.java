@@ -14,7 +14,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setLayout(new BorderLayout());
-        setSize(600, 700);
+        setSize(1000, 800);
     }
     
     public void setController(GameController controller) {

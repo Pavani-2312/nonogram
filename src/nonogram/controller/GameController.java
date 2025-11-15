@@ -24,9 +24,30 @@ public class GameController {
         view.initializeGame(board, currentPuzzle.getName());
     }
     
+    public void startGameWithPuzzle(Puzzle puzzle) {
+        currentPuzzle = puzzle;
+        board = new GameBoard(currentPuzzle.getSolution());
+        if (view == null) {
+            view = new MainFrame();
+            view.setController(this);
+            view.setVisible(true);
+        }
+        view.initializeGame(board, currentPuzzle.getName());
+    }
+    
+    public void startGameWithPuzzleIndex(int index) {
+        currentPuzzle = puzzleLoader.getAllPuzzles().get(index);
+        board = new GameBoard(currentPuzzle.getSolution());
+        
+        view = new MainFrame();
+        view.setController(this);
+        view.initializeGame(board, currentPuzzle.getName());
+        view.setVisible(true);
+    }
+    
     public void handleCellClick(int row, int col) {
         if (board.isPuzzleComplete()) {
-            return; // Ignore clicks after completion
+            return;
         }
         
         board.getCell(row, col).cycleState();

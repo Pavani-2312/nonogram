@@ -19,15 +19,15 @@ public class GamePanel extends JPanel {
         
         // Add puzzle title at the top
         JLabel titleLabel = new JLabel(puzzleName, JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         add(titleLabel, BorderLayout.NORTH);
         
         gridPanel = new GridPanel(board, controller);
         rowCluePanel = new CluePanel(board, true);
         columnCluePanel = new CluePanel(board, false);
         
-        // Create main game panel with proper alignment
+        // Create main game panel
         JPanel mainGamePanel = new JPanel(new BorderLayout());
         
         // Create grid and column clues panel
@@ -35,13 +35,14 @@ public class GamePanel extends JPanel {
         gridAndColumnPanel.add(gridPanel, BorderLayout.CENTER);
         gridAndColumnPanel.add(columnCluePanel, BorderLayout.SOUTH);
         
-        // Add components with proper alignment
+        // Add components
         mainGamePanel.add(rowCluePanel, BorderLayout.WEST);
         mainGamePanel.add(gridAndColumnPanel, BorderLayout.CENTER);
         
-        // Center the entire game
-        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Center the entire game with more padding
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
         centerWrapper.add(mainGamePanel);
+        centerWrapper.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         
         add(centerWrapper, BorderLayout.CENTER);
         setBackground(Color.WHITE);
