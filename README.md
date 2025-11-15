@@ -1,0 +1,103 @@
+# Nonogram Puzzle Game
+
+A Java implementation of the classic Nonogram puzzle game using MVC architecture and custom data structures.
+
+## Project Structure
+
+```
+nonogram/
+├── src/nonogram/           # Source code
+│   ├── Main.java          # Application entry point
+│   ├── datastructures/    # Custom data structures
+│   │   ├── MyLinkedList.java
+│   │   └── MyStack.java
+│   ├── model/             # Game logic and data
+│   │   ├── CellState.java
+│   │   ├── Cell.java
+│   │   ├── GameBoard.java
+│   │   └── Puzzle.java
+│   ├── view/              # User interface
+│   │   ├── MainFrame.java
+│   │   ├── GamePanel.java
+│   │   ├── GridPanel.java
+│   │   └── CluePanel.java
+│   └── controller/        # Game coordination
+│       ├── GameController.java
+│       └── PuzzleLoader.java
+├── bin/                   # Compiled classes
+├── docs/                  # Documentation
+├── compile.sh            # Compilation script
+└── README.md             # This file
+```
+
+## How to Build and Run
+
+### Prerequisites
+- Java Development Kit (JDK) 8 or higher
+
+### Compilation
+```bash
+./compile.sh
+```
+
+### Running the Game
+```bash
+java -cp bin nonogram.Main
+```
+
+## How to Play
+
+1. **Objective**: Fill cells in the grid to reveal a hidden picture
+2. **Clues**: Numbers on the left (rows) and top (columns) indicate consecutive filled cells
+3. **Controls**: 
+   - Left click to cycle through cell states: Empty → Filled → Marked → Empty
+   - Filled cells are black
+   - Marked cells have an X (indicating they should stay empty)
+4. **Win**: Complete the puzzle when all cells match the solution
+
+## Features Implemented
+
+- ✅ Custom data structures (MyLinkedList, MyStack with linked nodes)
+- ✅ MVC architecture
+- ✅ Interactive grid with mouse controls
+- ✅ Clue display for rows and columns
+- ✅ Win detection
+- ✅ Multiple built-in puzzles (Heart, Cross, Square)
+- ✅ Cell state cycling (Unknown → Filled → Marked)
+
+## Game Architecture
+
+### Model Layer
+- **Cell**: Individual grid cell with state and solution
+- **GameBoard**: Complete puzzle grid with clues
+- **Puzzle**: Puzzle definition with solution
+
+### View Layer
+- **MainFrame**: Main application window
+- **GamePanel**: Game layout container
+- **GridPanel**: Interactive cell grid
+- **CluePanel**: Displays row/column clues
+
+### Controller Layer
+- **GameController**: Coordinates game logic and UI
+- **PuzzleLoader**: Manages puzzle data
+
+### Custom Data Structures
+- **MyLinkedList**: Dynamic linked list for clue storage
+- **MyStack**: Proper stack implementation with linked nodes (ready for undo functionality)
+
+## Default Puzzles
+
+The game includes three 5×5 puzzles:
+1. **Heart**: Classic heart shape
+2. **Cross**: Plus sign pattern
+3. **Square**: Hollow square outline
+
+## Development Notes
+
+- No external dependencies (pure Java Swing)
+- Custom data structures replace Java Collections
+- MyLinkedList for efficient clue storage
+- MyStack with proper linked node implementation
+- Follows MVC design pattern
+- Extensible architecture for adding features

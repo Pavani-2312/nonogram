@@ -15,39 +15,50 @@ This document specifies the custom data structures required for implementing a N
 
 | Data Structure | Primary Use Case | Key Operations | Complexity |
 |---------------|------------------|----------------|------------|
-| MyArrayList<E> | Clue storage, puzzle catalog | add, get, remove | O(1) amortized |
+| MyLinkedList<E> | Clue storage, dynamic sequences | add, get, size | O(1) add, O(n) get |
 | MyStack<E> | Undo/redo mechanism | push, pop, peek | O(1) |
-| MyQueue<E> | Hint sequencing | enqueue, dequeue | O(1) |
-| MyHashMap<K,V> | Puzzle lookup, statistics | put, get, remove | O(1) average |
+
+### 2.2 Implementation Rationale
+
+**MyLinkedList vs MyArrayList**:
+- Better memory efficiency for variable-length clue sequences
+- No need for array resizing operations
+- Optimal for frequent additions (clue generation)
+- Acceptable O(n) access time for small clue lists
+
+**MyStack with Linked Nodes**:
+- Pure implementation without using pre-defined structures
+- Proper LIFO behavior with linked nodes
+- Memory efficient for undo operations
 
 ---
 
-## 3. MyArrayList<E> - Dynamic Array Implementation
+## 3. MyLinkedList<E> - Linked List Implementation
 
 ### 3.1 Functional Role in Nonogram
 
-MyArrayList serves as the foundational data structure for storing variable-length sequences throughout the application.
+MyLinkedList serves as the foundational data structure for storing variable-length sequences throughout the application.
 
 #### 3.1.1 Clue Number Storage
 **Purpose**: Each row and column in a Nonogram puzzle contains a sequence of clue numbers indicating consecutive filled cells.
 
 **Implementation Requirement**:
-- Row 1 clue "3" → MyArrayList containing single Integer: [3]
-- Row 2 clue "2 1 3" → MyArrayList containing: [2, 1, 3]
-- Row 3 clue "1 1 1 1" → MyArrayList containing: [1, 1, 1, 1]
+- Row 1 clue "3" → MyLinkedList containing single Integer: [3]
+- Row 2 clue "2 1 3" → MyLinkedList containing: [2, 1, 3]
+- Row 3 clue "1 1 1 1" → MyLinkedList containing: [1, 1, 1, 1]
 
 **Data Structure Nesting**:
 ```
-MyArrayList<MyArrayList<Integer>> rowClues
-├─ Index 0: MyArrayList [2, 3]      // Row 0 clues
-├─ Index 1: MyArrayList [1, 1]      // Row 1 clues
-├─ Index 2: MyArrayList [5]         // Row 2 clues
-└─ Index 3: MyArrayList [2, 1, 2]   // Row 3 clues
+MyLinkedList<MyLinkedList<Integer>> rowClues
+├─ Index 0: MyLinkedList [2, 3]      // Row 0 clues
+├─ Index 1: MyLinkedList [1, 1]      // Row 1 clues
+├─ Index 2: MyLinkedList [5]         // Row 2 clues
+└─ Index 3: MyLinkedList [2, 1, 2]   // Row 3 clues
 
-MyArrayList<MyArrayList<Integer>> columnClues
-├─ Index 0: MyArrayList [3, 1]      // Column 0 clues
-├─ Index 1: MyArrayList [2, 2]      // Column 1 clues
-└─ Index 2: MyArrayList [1, 1, 1]   // Column 2 clues
+MyLinkedList<MyLinkedList<Integer>> columnClues
+├─ Index 0: MyLinkedList [3, 1]      // Column 0 clues
+├─ Index 1: MyLinkedList [2, 2]      // Column 1 clues
+└─ Index 2: MyLinkedList [1, 1, 1]   // Column 2 clues
 ```
 
 **Rationale**: Variable-length sequences require dynamic storage. Fixed arrays would waste memory for short clues and limit long clues.
@@ -129,21 +140,34 @@ To get all EASY puzzles:
 ### 3.2 Essential Methods
 
 **Core Operations**:
-- `add(E element)` - Append element, O(1) amortized
-- `add(int index, E element)` - Insert at position, O(n)
-- `get(int index)` - Retrieve element, O(1)
-- `set(int index, E element)` - Replace element, O(1)
-- `remove(int index)` - Delete by position, O(n)
-- `remove(E element)` - Delete by value, O(n)
-- `indexOf(E element)` - Find first occurrence, O(n)
-- `contains(E element)` - Check existence, O(n)
+- `add(E element)` - Append element to end, O(1)
+- `get(int index)` - Retrieve element by position, O(n)
 - `size()` - Get element count, O(1)
 - `isEmpty()` - Check if empty, O(1)
-- `clear()` - Remove all elements, O(n)
 
-**Internal Operations**:
-- `ensureCapacity()` - Double array size when full
-- Array starts at capacity 10, grows by factor of 2
+**Implementation Structure**:
+```java
+public class MyLinkedList<E> {
+    private Node<E> head;
+    private int size;
+    
+    private static class Node<E> {
+        E data;
+        Node<E> next;
+    }
+    
+    public void add(E element) { /* append to end */ }
+    public E get(int index) { /* traverse to index */ }
+    public int size() { return size; }
+    public boolean isEmpty() { return size == 0; }
+}
+```
+
+**Performance Characteristics**:
+- Add operation: O(1) - always append to end
+- Get operation: O(n) - must traverse from head
+- Memory efficient: no unused array slots
+- Suitable for clue storage where access is infrequent
 
 ---
 
@@ -245,14 +269,34 @@ When player makes ANY new move after undo:
 
 **Core Operations**:
 - `push(E element)` - Add element to top, O(1)
-- `pop()` - Remove and return top element, O(1), throws EmptyStackException if empty
-- `peek()` - View top element without removal, O(1), throws EmptyStackException if empty
+- `pop()` - Remove and return top element, O(1)
+- `peek()` - View top element without removal, O(1)
 - `isEmpty()` - Check if stack empty, O(1)
 - `size()` - Get element count, O(1)
-- `clear()` - Remove all elements, O(n)
 
-**Internal Implementation**:
-Stack can internally use MyArrayList or custom array with top pointer.
+**Implementation Structure**:
+```java
+public class MyStack<E> {
+    private Node<E> top;
+    private int size;
+    
+    private static class Node<E> {
+        E data;
+        Node<E> next;
+    }
+    
+    public void push(E element) { /* add to top */ }
+    public E pop() { /* remove from top */ }
+    public E peek() { /* view top */ }
+    public boolean isEmpty() { return top == null; }
+}
+```
+
+**Pure Implementation**:
+- No dependency on other data structures
+- Direct linked node implementation
+- Proper LIFO behavior
+- Memory efficient for undo operations
 
 ---
 
@@ -651,64 +695,55 @@ graphics.fillRect(0, 0, width, height);
 
 ```
 GameController
-    ├── MyStack<Move> undoStack
-    ├── MyStack<Move> redoStack
-    └── MyHashMap<String, Puzzle> puzzleLibrary
+    └── MyStack<Move> undoStack
 
 Puzzle
-    ├── MyArrayList<MyArrayList<Integer>> rowClues
-    └── MyArrayList<MyArrayList<Integer>> columnClues
+    ├── MyLinkedList<MyLinkedList<Integer>> rowClues
+    └── MyLinkedList<MyLinkedList<Integer>> columnClues
 
-HintController
-    ├── MyQueue<Hint> hintQueue
-    └── MyArrayList<CellPosition> highlightedCells
+GameBoard
+    ├── MyLinkedList<MyLinkedList<Integer>> rowClues
+    └── MyLinkedList<MyLinkedList<Integer>> columnClues
 
-GameState
-    ├── MyArrayList<Integer> completedRows
-    ├── MyArrayList<Integer> completedColumns
-    └── MyHashMap<String, PuzzleStats> statistics
-
-ValidationController
-    └── MyArrayList<CellPosition> errorCells
+PuzzleLoader
+    └── MyLinkedList<Puzzle> puzzleLibrary
 ```
 
 ### 8.2 Memory Efficiency Considerations
 
 **Clue Storage**:
-- 15×15 grid worst case: 15 rows + 15 columns = 30 MyArrayList instances
+- 15×15 grid worst case: 15 rows + 15 columns = 30 MyLinkedList instances
 - Each clue list: ~5 integers average = 30 × 5 = 150 integers total
-- Memory: ~600 bytes (acceptable)
+- Linked list overhead: ~16 bytes per node
+- Memory: ~2.4KB + overhead (acceptable)
 
 **Move History**:
 - 15×15 grid = 225 cells maximum
 - Each Move object: ~40 bytes
-- Full undo stack: 225 × 40 = 9KB (acceptable)
+- Stack nodes: ~16 bytes each
+- Full undo stack: 225 × 56 = 12.6KB (acceptable)
 
-**Puzzle Library**:
-- 100 puzzles × ~2KB per puzzle = 200KB
-- HashMap with load factor 0.75: ~266 buckets
-- Memory: ~210KB total (acceptable)
+**Performance Trade-offs**:
+- MyLinkedList: O(1) add, O(n) get - optimal for clue generation, acceptable for small lists
+- MyStack: O(1) all operations - optimal for undo functionality
 
 ---
 
 ## 9. Implementation Priority Order
 
 **Phase 1: Core Data Structures**
-1. MyArrayList - Required for all other components
-2. MyStack - Needed for undo/redo
-3. MyQueue - Needed for hints
-4. MyHashMap - Needed for puzzle management
+1. MyLinkedList - Foundation for all clue storage
+2. MyStack - Essential for undo functionality
 
 **Phase 2: Integration**
-1. Integrate MyArrayList into Puzzle class for clues
+1. Integrate MyLinkedList into GameBoard for clues
 2. Integrate MyStack into GameController for undo/redo
-3. Integrate MyQueue into HintController
-4. Integrate MyHashMap into puzzle loading system
+3. Test with game components
 
 **Phase 3: Testing**
 1. Unit test each data structure independently
 2. Integration test with game components
-3. Performance test with large puzzles (20×20)
+3. Performance test with various puzzle sizes
 4. Memory test with extensive move history
 
 ---
