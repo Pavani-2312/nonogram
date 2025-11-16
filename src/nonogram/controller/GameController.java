@@ -11,10 +11,12 @@ public class GameController {
     private PuzzleLoader puzzleLoader;
     private Puzzle currentPuzzle;
     private int currentPuzzleIndex;
+    private Difficulty currentDifficulty;
     private boolean xMode = false;
     
     public GameController() {
         puzzleLoader = new PuzzleLoader();
+        currentDifficulty = Difficulty.EASY;
         currentPuzzleIndex = 0;
     }
     
@@ -23,7 +25,10 @@ public class GameController {
     }
     
     public void startNewGame() {
-        currentPuzzle = puzzleLoader.getDefaultPuzzle();
+        currentPuzzle = puzzleLoader.getPuzzle(currentDifficulty, 0);
+        if (currentPuzzle == null) {
+            currentPuzzle = puzzleLoader.getDefaultPuzzle();
+        }
         currentPuzzleIndex = 0;
         initializeGame();
     }
@@ -57,6 +62,12 @@ public class GameController {
         
         Cell cell = board.getCell(row, col);
         CellState oldState = cell.getCurrentState();
+        
+        // Don't lose life if cell is already correctly filled
+        if (cell.isCorrect()) {
+            return;
+        }
+        
         CellState newState;
         
         if (xMode) {
@@ -87,7 +98,8 @@ public class GameController {
             board.autoFillMarks();
             view.updateDisplay();
             
-            if (gameState.isComplete()) {
+            // Check completion after auto-fill
+            if (board.isPuzzleComplete()) {
                 view.showCompletionMessage();
             }
         }
@@ -121,17 +133,22 @@ public class GameController {
     }
     
     public void nextPuzzle() {
-        MyLinkedList<Puzzle> puzzles = puzzleLoader.getAllPuzzles();
-        if (currentPuzzleIndex < puzzles.size() - 1) {
+        MyLinkedList<Puzzle> currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
+        if (currentDifficultyPuzzles != null && currentPuzzleIndex < currentDifficultyPuzzles.size() - 1) {
             currentPuzzleIndex++;
-            startGameWithPuzzleIndex(currentPuzzleIndex);
+            currentPuzzle = currentDifficultyPuzzles.get(currentPuzzleIndex);
+            initializeGame();
         }
     }
     
     public void previousPuzzle() {
         if (currentPuzzleIndex > 0) {
             currentPuzzleIndex--;
-            startGameWithPuzzleIndex(currentPuzzleIndex);
+            MyLinkedList<Puzzle> currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
+            if (currentDifficultyPuzzles != null) {
+                currentPuzzle = currentDifficultyPuzzles.get(currentPuzzleIndex);
+                initializeGame();
+            }
         }
     }
     
@@ -150,7 +167,8 @@ public class GameController {
     }
     
     public boolean hasNextPuzzle() {
-        return currentPuzzleIndex < puzzleLoader.getAllPuzzles().size() - 1;
+        MyLinkedList<Puzzle> currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
+        return currentDifficultyPuzzles != null && currentPuzzleIndex < currentDifficultyPuzzles.size() - 1;
     }
     
     public boolean hasPreviousPuzzle() {
@@ -164,5 +182,18 @@ public class GameController {
     public void toggleXMode() {
         xMode = !xMode;
         view.updateXButton(xMode);
+    }
+    
+    public void setDifficulty(Difficulty difficulty) {
+        currentDifficulty = difficulty;
+        currentPuzzleIndex = 0;
+        currentPuzzle = puzzleLoader.getPuzzle(difficulty, 0);
+        if (currentPuzzle != null) {
+            initializeGame();
+        }
+    }
+    
+    public Difficulty getCurrentDifficulty() {
+        return currentDifficulty;
     }
 }

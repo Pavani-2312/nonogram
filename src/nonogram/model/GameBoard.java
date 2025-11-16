@@ -80,6 +80,34 @@ public class GameBoard {
         for (int col = 0; col < cols; col++) {
             autoFillColumnMarks(col);
         }
+        
+        // Auto-fill remaining cells if all blacks are correctly filled
+        autoFillRemainingCells();
+    }
+    
+    private void autoFillRemainingCells() {
+        // Check if all black cells are correctly filled
+        boolean allBlacksFilled = true;
+        for (int row = 0; row < rows && allBlacksFilled; row++) {
+            for (int col = 0; col < cols && allBlacksFilled; col++) {
+                Cell cell = cells[row][col];
+                if (cell.getActualValue() && cell.getCurrentState() != CellState.FILLED) {
+                    allBlacksFilled = false;
+                }
+            }
+        }
+        
+        // If all blacks are filled, mark remaining unknowns as MARKED
+        if (allBlacksFilled) {
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
+                    Cell cell = cells[row][col];
+                    if (cell.getCurrentState() == CellState.UNKNOWN) {
+                        cell.setState(CellState.MARKED);
+                    }
+                }
+            }
+        }
     }
     
     private void autoFillRowMarks(int row) {

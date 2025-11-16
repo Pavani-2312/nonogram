@@ -87,6 +87,27 @@ public class MainFrame extends JFrame {
         gameMenu.add(previousPuzzleItem);
         gameMenu.add(nextPuzzleItem);
         gameMenu.addSeparator();
+        
+        // Difficulty submenu
+        JMenu difficultyMenu = new JMenu("Difficulty");
+        difficultyMenu.setMnemonic(KeyEvent.VK_D);
+        
+        ButtonGroup difficultyGroup = new ButtonGroup();
+        for (Difficulty diff : Difficulty.values()) {
+            JRadioButtonMenuItem diffItem = new JRadioButtonMenuItem(diff.getDisplayName());
+            diffItem.setSelected(diff == Difficulty.EASY); // Default selection
+            difficultyGroup.add(diffItem);
+            diffItem.addActionListener(e -> {
+                if (controller != null) {
+                    controller.setDifficulty(diff);
+                    updateMenuStates();
+                }
+            });
+            difficultyMenu.add(diffItem);
+        }
+        
+        gameMenu.add(difficultyMenu);
+        gameMenu.addSeparator();
         gameMenu.add(exit);
         
         // Edit Menu
