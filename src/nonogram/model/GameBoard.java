@@ -53,6 +53,10 @@ public class GameBoard {
         return true;
     }
     
+    public boolean isSolved() {
+        return isPuzzleComplete();
+    }
+    
     public void reset() {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {

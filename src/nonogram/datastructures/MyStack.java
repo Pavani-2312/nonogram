@@ -51,4 +51,9 @@ public class MyStack<E> {
     public int size() {
         return size;
     }
+    
+    public void clear() {
+        top = null;
+        size = 0;
+    }
 }

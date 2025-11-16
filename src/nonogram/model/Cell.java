@@ -21,6 +21,10 @@ public class Cell {
         this.currentState = newState;
     }
     
+    public void setCurrentState(CellState newState) {
+        this.currentState = newState;
+    }
+    
     public void cycleState() {
         switch (currentState) {
             case UNKNOWN:
