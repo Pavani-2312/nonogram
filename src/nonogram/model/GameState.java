@@ -10,6 +10,7 @@ public class GameState {
     private long startTime;
     private long endTime;
     private int hintsUsed;
+    private int lives;
     
     public GameState(GameBoard board) {
         this.board = board;
@@ -19,6 +20,7 @@ public class GameState {
         this.startTime = System.currentTimeMillis();
         this.endTime = 0;
         this.hintsUsed = 0;
+        this.lives = 3;
     }
     
     public GameBoard getBoard() {
@@ -97,6 +99,20 @@ public class GameState {
         hintsUsed++;
     }
     
+    public int getLives() {
+        return lives;
+    }
+    
+    public void loseLife() {
+        if (lives > 0) {
+            lives--;
+        }
+    }
+    
+    public boolean hasLives() {
+        return lives > 0;
+    }
+    
     private void checkCompletion() {
         if (board.isSolved()) {
             isComplete = true;
@@ -111,6 +127,7 @@ public class GameState {
         startTime = System.currentTimeMillis();
         endTime = 0;
         hintsUsed = 0;
+        lives = 3;
         
         // Reset all cells to unknown state
         for (int row = 0; row < board.getRows(); row++) {

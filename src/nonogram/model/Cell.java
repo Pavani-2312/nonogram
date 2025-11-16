@@ -56,6 +56,17 @@ public class Cell {
         }
     }
     
+    public boolean isWrong() {
+        switch (currentState) {
+            case FILLED:
+                return actualValue == false;
+            case MARKED:
+                return actualValue == true;
+            default:
+                return false;
+        }
+    }
+    
     public int getRow() {
         return row;
     }

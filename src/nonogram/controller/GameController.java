@@ -51,7 +51,7 @@ public class GameController {
     }
     
     public void handleCellClick(int row, int col) {
-        if (gameState.isComplete()) {
+        if (gameState.isComplete() || !gameState.hasLives()) {
             return;
         }
         
@@ -67,12 +67,29 @@ public class GameController {
             newState = oldState.getNextState();
         }
         
-        gameState.makeMove(new CellPosition(row, col), newState);
-        board.autoFillMarks();
-        view.updateDisplay();
+        // Check if the move would be wrong
+        CellState tempState = cell.getCurrentState();
+        cell.setCurrentState(newState);
+        boolean isWrongMove = cell.isWrong();
+        cell.setCurrentState(tempState); // Restore original state
         
-        if (gameState.isComplete()) {
-            view.showCompletionMessage();
+        if (isWrongMove) {
+            gameState.loseLife();
+            view.showWrongMove(row, col);
+            view.updateLivesDisplay(gameState.getLives());
+            
+            if (!gameState.hasLives()) {
+                view.showGameOver();
+                return;
+            }
+        } else {
+            gameState.makeMove(new CellPosition(row, col), newState);
+            board.autoFillMarks();
+            view.updateDisplay();
+            
+            if (gameState.isComplete()) {
+                view.showCompletionMessage();
+            }
         }
     }
     
@@ -121,6 +138,7 @@ public class GameController {
     public void resetPuzzle() {
         gameState.reset();
         view.updateDisplay();
+        view.updateLivesDisplay(gameState.getLives());
     }
     
     public boolean canUndo() {

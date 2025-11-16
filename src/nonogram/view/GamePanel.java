@@ -12,17 +12,26 @@ public class GamePanel extends JPanel {
     private GameBoard board;
     private String puzzleName;
     private JButton xButton;
+    private JLabel livesLabel;
     
     public GamePanel(GameBoard board, GameController controller, String puzzleName) {
         this.board = board;
         this.puzzleName = puzzleName;
         setLayout(new BorderLayout());
         
-        // Add puzzle title at the top
+        // Add puzzle title and lives at the top
+        JPanel topPanel = new JPanel(new BorderLayout());
         JLabel titleLabel = new JLabel(puzzleName, JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(titleLabel, BorderLayout.NORTH);
+        
+        livesLabel = new JLabel("Lives: 3", JLabel.RIGHT);
+        livesLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        livesLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        topPanel.add(titleLabel, BorderLayout.CENTER);
+        topPanel.add(livesLabel, BorderLayout.EAST);
+        add(topPanel, BorderLayout.NORTH);
         
         gridPanel = new GridPanel(board, controller);
         rowCluePanel = new CluePanel(board, true);
@@ -73,6 +82,19 @@ public class GamePanel extends JPanel {
         } else {
             xButton.setBackground(null);
             xButton.setText("X");
+        }
+    }
+    
+    public void showWrongMove(int row, int col) {
+        gridPanel.showWrongMove(row, col);
+    }
+    
+    public void updateLivesDisplay(int lives) {
+        livesLabel.setText("Lives: " + lives);
+        if (lives <= 1) {
+            livesLabel.setForeground(Color.RED);
+        } else {
+            livesLabel.setForeground(Color.BLACK);
         }
     }
 }

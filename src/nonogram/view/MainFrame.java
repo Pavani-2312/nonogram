@@ -248,6 +248,9 @@ public class MainFrame extends JFrame {
                 "Hints used: " + gameState.getHintsUsed();
         
         JOptionPane.showMessageDialog(this, message, "Congratulations", JOptionPane.INFORMATION_MESSAGE);
+        if (controller != null) {
+            controller.resetPuzzle();
+        }
     }
     
     public void showHint(Hint hint) {
@@ -273,6 +276,25 @@ public class MainFrame extends JFrame {
     public void updateXButton(boolean xMode) {
         if (gamePanel != null) {
             gamePanel.updateXButton(xMode);
+        }
+    }
+    
+    public void showWrongMove(int row, int col) {
+        if (gamePanel != null) {
+            gamePanel.showWrongMove(row, col);
+        }
+    }
+    
+    public void updateLivesDisplay(int lives) {
+        if (gamePanel != null) {
+            gamePanel.updateLivesDisplay(lives);
+        }
+    }
+    
+    public void showGameOver() {
+        JOptionPane.showMessageDialog(this, "Game Over! No lives remaining.", "Game Over", JOptionPane.ERROR_MESSAGE);
+        if (controller != null) {
+            controller.resetPuzzle();
         }
     }
 }

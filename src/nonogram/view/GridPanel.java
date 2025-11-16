@@ -13,6 +13,8 @@ public class GridPanel extends JPanel {
     private GameBoard board;
     private GameController controller;
     private static final int CELL_SIZE = 30;
+    private int wrongRow = -1;
+    private int wrongCol = -1;
     
     public GridPanel(GameBoard board, GameController controller) {
         this.board = board;
@@ -64,6 +66,13 @@ public class GridPanel extends JPanel {
         int x = col * CELL_SIZE;
         int y = row * CELL_SIZE;
         
+        // Check if this is the wrong move cell
+        if (row == wrongRow && col == wrongCol) {
+            g.setColor(Color.RED);
+            g.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+            return;
+        }
+        
         switch (cell.getCurrentState()) {
             case UNKNOWN:
                 g.setColor(Color.WHITE);
@@ -82,5 +91,19 @@ public class GridPanel extends JPanel {
                 g.drawLine(x + 8, y + CELL_SIZE - 8, x + CELL_SIZE - 8, y + 8);
                 break;
         }
+    }
+    
+    public void showWrongMove(int row, int col) {
+        wrongRow = row;
+        wrongCol = col;
+        repaint();
+        
+        Timer timer = new Timer(1000, e -> {
+            wrongRow = -1;
+            wrongCol = -1;
+            repaint();
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 }
