@@ -73,6 +73,111 @@ public class GameBoard {
         return cols;
     }
     
+    public void autoFillMarks() {
+        for (int row = 0; row < rows; row++) {
+            autoFillRowMarks(row);
+        }
+        for (int col = 0; col < cols; col++) {
+            autoFillColumnMarks(col);
+        }
+    }
+    
+    private void autoFillRowMarks(int row) {
+        MyLinkedList<Integer> clues = rowClues.get(row);
+        if (isRowCluesSatisfied(row, clues)) {
+            for (int col = 0; col < cols; col++) {
+                if (cells[row][col].getCurrentState() == CellState.UNKNOWN) {
+                    cells[row][col].setState(CellState.MARKED);
+                }
+            }
+        }
+    }
+    
+    private void autoFillColumnMarks(int col) {
+        MyLinkedList<Integer> clues = columnClues.get(col);
+        if (isColumnCluesSatisfied(col, clues)) {
+            for (int row = 0; row < rows; row++) {
+                if (cells[row][col].getCurrentState() == CellState.UNKNOWN) {
+                    cells[row][col].setState(CellState.MARKED);
+                }
+            }
+        }
+    }
+    
+    private boolean isRowCluesSatisfied(int row, MyLinkedList<Integer> clues) {
+        // Check if filled cells match the solution pattern
+        for (int col = 0; col < cols; col++) {
+            if (cells[row][col].getCurrentState() == CellState.FILLED) {
+                if (!cells[row][col].getActualValue()) {
+                    return false; // Filled cell doesn't match solution
+                }
+            }
+        }
+        
+        // Check if current filled pattern matches clues
+        MyLinkedList<Integer> currentClues = new MyLinkedList<>();
+        int count = 0;
+        
+        for (int col = 0; col < cols; col++) {
+            if (cells[row][col].getCurrentState() == CellState.FILLED) {
+                count++;
+            } else {
+                if (count > 0) {
+                    currentClues.add(count);
+                    count = 0;
+                }
+            }
+        }
+        if (count > 0) {
+            currentClues.add(count);
+        }
+        
+        return cluesMatch(currentClues, clues);
+    }
+    
+    private boolean isColumnCluesSatisfied(int col, MyLinkedList<Integer> clues) {
+        // Check if filled cells match the solution pattern
+        for (int row = 0; row < rows; row++) {
+            if (cells[row][col].getCurrentState() == CellState.FILLED) {
+                if (!cells[row][col].getActualValue()) {
+                    return false; // Filled cell doesn't match solution
+                }
+            }
+        }
+        
+        // Check if current filled pattern matches clues
+        MyLinkedList<Integer> currentClues = new MyLinkedList<>();
+        int count = 0;
+        
+        for (int row = 0; row < rows; row++) {
+            if (cells[row][col].getCurrentState() == CellState.FILLED) {
+                count++;
+            } else {
+                if (count > 0) {
+                    currentClues.add(count);
+                    count = 0;
+                }
+            }
+        }
+        if (count > 0) {
+            currentClues.add(count);
+        }
+        
+        return cluesMatch(currentClues, clues);
+    }
+    
+    private boolean cluesMatch(MyLinkedList<Integer> current, MyLinkedList<Integer> target) {
+        if (current.size() != target.size()) {
+            return false;
+        }
+        for (int i = 0; i < current.size(); i++) {
+            if (!current.get(i).equals(target.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private void generateCluesFromSolution(boolean[][] solution) {
         // Generate row clues
         for (int row = 0; row < rows; row++) {

@@ -46,4 +46,8 @@ public class GamePanel extends JPanel {
         add(centerWrapper, BorderLayout.CENTER);
         setBackground(Color.WHITE);
     }
+    
+    public GameBoard getBoard() {
+        return board;
+    }
 }

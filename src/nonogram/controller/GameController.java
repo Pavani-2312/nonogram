@@ -1,17 +1,20 @@
 package nonogram.controller;
 
-import nonogram.model.GameBoard;
-import nonogram.model.Puzzle;
+import nonogram.model.*;
 import nonogram.view.MainFrame;
+import nonogram.datastructures.MyLinkedList;
 
 public class GameController {
     private GameBoard board;
+    private GameState gameState;
     private MainFrame view;
     private PuzzleLoader puzzleLoader;
     private Puzzle currentPuzzle;
+    private int currentPuzzleIndex;
     
     public GameController() {
         puzzleLoader = new PuzzleLoader();
+        currentPuzzleIndex = 0;
     }
     
     public void setView(MainFrame view) {
@@ -20,46 +23,114 @@ public class GameController {
     
     public void startNewGame() {
         currentPuzzle = puzzleLoader.getDefaultPuzzle();
-        board = new GameBoard(currentPuzzle.getSolution());
-        view.initializeGame(board, currentPuzzle.getName());
+        currentPuzzleIndex = 0;
+        initializeGame();
     }
     
     public void startGameWithPuzzle(Puzzle puzzle) {
         currentPuzzle = puzzle;
-        board = new GameBoard(currentPuzzle.getSolution());
-        if (view == null) {
-            view = new MainFrame();
-            view.setController(this);
-            view.setVisible(true);
-        }
-        view.initializeGame(board, currentPuzzle.getName());
+        initializeGame();
     }
     
     public void startGameWithPuzzleIndex(int index) {
-        currentPuzzle = puzzleLoader.getAllPuzzles().get(index);
+        MyLinkedList<Puzzle> puzzles = puzzleLoader.getAllPuzzles();
+        if (index >= 0 && index < puzzles.size()) {
+            currentPuzzleIndex = index;
+            currentPuzzle = puzzles.get(index);
+            initializeGame();
+        }
+    }
+    
+    private void initializeGame() {
         board = new GameBoard(currentPuzzle.getSolution());
-        
-        view = new MainFrame();
-        view.setController(this);
-        view.initializeGame(board, currentPuzzle.getName());
-        view.setVisible(true);
+        gameState = new GameState(board);
+        if (view != null) {
+            view.initializeGame(board, currentPuzzle.getName());
+        }
     }
     
     public void handleCellClick(int row, int col) {
-        if (board.isPuzzleComplete()) {
+        if (gameState.isComplete()) {
             return;
         }
         
-        board.getCell(row, col).cycleState();
+        Cell cell = board.getCell(row, col);
+        CellState oldState = cell.getCurrentState();
+        CellState newState = oldState.getNextState();
+        
+        gameState.makeMove(new CellPosition(row, col), newState);
+        board.autoFillMarks();
         view.updateDisplay();
         
-        if (board.isPuzzleComplete()) {
+        if (gameState.isComplete()) {
             view.showCompletionMessage();
         }
     }
     
+    public void undo() {
+        if (gameState.canUndo()) {
+            gameState.undo();
+            view.updateDisplay();
+        }
+    }
+    
+    public void redo() {
+        if (gameState.canRedo()) {
+            gameState.redo();
+            board.autoFillMarks();
+            view.updateDisplay();
+        }
+    }
+    
+    public void getHint() {
+        if (!gameState.isComplete()) {
+            Hint hint = HintGenerator.generateHint(board);
+            if (hint != null) {
+                gameState.incrementHintsUsed();
+                view.showHint(hint);
+            } else {
+                view.showNoHintMessage();
+            }
+        }
+    }
+    
+    public void nextPuzzle() {
+        MyLinkedList<Puzzle> puzzles = puzzleLoader.getAllPuzzles();
+        if (currentPuzzleIndex < puzzles.size() - 1) {
+            currentPuzzleIndex++;
+            startGameWithPuzzleIndex(currentPuzzleIndex);
+        }
+    }
+    
+    public void previousPuzzle() {
+        if (currentPuzzleIndex > 0) {
+            currentPuzzleIndex--;
+            startGameWithPuzzleIndex(currentPuzzleIndex);
+        }
+    }
+    
     public void resetPuzzle() {
-        board.reset();
+        gameState.reset();
         view.updateDisplay();
+    }
+    
+    public boolean canUndo() {
+        return gameState != null && gameState.canUndo();
+    }
+    
+    public boolean canRedo() {
+        return gameState != null && gameState.canRedo();
+    }
+    
+    public boolean hasNextPuzzle() {
+        return currentPuzzleIndex < puzzleLoader.getAllPuzzles().size() - 1;
+    }
+    
+    public boolean hasPreviousPuzzle() {
+        return currentPuzzleIndex > 0;
+    }
+    
+    public GameState getGameState() {
+        return gameState;
     }
 }
