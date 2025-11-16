@@ -11,6 +11,7 @@ public class GamePanel extends JPanel {
     private CluePanel columnCluePanel;
     private GameBoard board;
     private String puzzleName;
+    private JButton xButton;
     
     public GamePanel(GameBoard board, GameController controller, String puzzleName) {
         this.board = board;
@@ -27,6 +28,13 @@ public class GamePanel extends JPanel {
         rowCluePanel = new CluePanel(board, true);
         columnCluePanel = new CluePanel(board, false);
         
+        // Create X button
+        xButton = new JButton("X");
+        xButton.setPreferredSize(new Dimension(25, 25));
+        xButton.setFont(new Font("Arial", Font.BOLD, 12));
+        xButton.setMargin(new Insets(0, 0, 0, 0));
+        xButton.addActionListener(e -> controller.toggleXMode());
+        
         // Create main game panel with proper alignment
         JPanel mainGamePanel = new JPanel(new BorderLayout());
         
@@ -35,8 +43,15 @@ public class GamePanel extends JPanel {
         gridAndColumnPanel.add(gridPanel, BorderLayout.CENTER);
         gridAndColumnPanel.add(columnCluePanel, BorderLayout.SOUTH);
         
+        // Create left panel with X button and row clues
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        JPanel xButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        xButtonPanel.add(xButton);
+        leftPanel.add(xButtonPanel, BorderLayout.WEST);
+        leftPanel.add(rowCluePanel, BorderLayout.CENTER);
+        
         // Add components with proper alignment
-        mainGamePanel.add(rowCluePanel, BorderLayout.WEST);
+        mainGamePanel.add(leftPanel, BorderLayout.WEST);
         mainGamePanel.add(gridAndColumnPanel, BorderLayout.CENTER);
         
         // Center the entire game
@@ -49,5 +64,15 @@ public class GamePanel extends JPanel {
     
     public GameBoard getBoard() {
         return board;
+    }
+    
+    public void updateXButton(boolean xMode) {
+        if (xMode) {
+            xButton.setBackground(Color.LIGHT_GRAY);
+            xButton.setText("X");
+        } else {
+            xButton.setBackground(null);
+            xButton.setText("X");
+        }
     }
 }

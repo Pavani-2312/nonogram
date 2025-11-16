@@ -11,6 +11,7 @@ public class GameController {
     private PuzzleLoader puzzleLoader;
     private Puzzle currentPuzzle;
     private int currentPuzzleIndex;
+    private boolean xMode = false;
     
     public GameController() {
         puzzleLoader = new PuzzleLoader();
@@ -56,7 +57,15 @@ public class GameController {
         
         Cell cell = board.getCell(row, col);
         CellState oldState = cell.getCurrentState();
-        CellState newState = oldState.getNextState();
+        CellState newState;
+        
+        if (xMode) {
+            newState = CellState.MARKED;
+            xMode = false;
+            view.updateXButton(false);
+        } else {
+            newState = oldState.getNextState();
+        }
         
         gameState.makeMove(new CellPosition(row, col), newState);
         board.autoFillMarks();
@@ -132,5 +141,10 @@ public class GameController {
     
     public GameState getGameState() {
         return gameState;
+    }
+    
+    public void toggleXMode() {
+        xMode = !xMode;
+        view.updateXButton(xMode);
     }
 }

@@ -269,4 +269,10 @@ public class MainFrame extends JFrame {
     public void showNoHintMessage() {
         JOptionPane.showMessageDialog(this, "No hints available at this time.", "No Hint", JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    public void updateXButton(boolean xMode) {
+        if (gamePanel != null) {
+            gamePanel.updateXButton(xMode);
+        }
+    }
 }
