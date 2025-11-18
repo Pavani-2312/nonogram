@@ -15,13 +15,17 @@ public class MainFrame extends JFrame {
     private JMenuItem redoItem;
     private JMenuItem nextPuzzleItem;
     private JMenuItem previousPuzzleItem;
+    private JLabel puzzleNameLabel;
+    private JLabel menuLivesLabel;
     
     public MainFrame() {
         setTitle("Nonogram Puzzle Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setLayout(new BorderLayout());
-        setSize(1000, 800);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize.width, screenSize.height);
         createMenuBar();
     }
     
@@ -191,6 +195,25 @@ public class MainFrame extends JFrame {
         menuBar.add(editMenu);
         menuBar.add(helpMenu);
         
+        // Center the puzzle name slightly to the left
+        menuBar.add(Box.createHorizontalGlue());
+        
+        puzzleNameLabel = new JLabel("Heart", JLabel.CENTER);
+        puzzleNameLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        menuBar.add(puzzleNameLabel);
+        
+        menuBar.add(Box.createHorizontalStrut(100));
+        menuBar.add(Box.createHorizontalGlue());
+        
+        menuLivesLabel = new JLabel("Lives: 3");
+        menuLivesLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        menuBar.add(menuLivesLabel);
+        
+        menuBar.add(Box.createHorizontalStrut(10));
+        
+        // Increase menu bar height
+        menuBar.setPreferredSize(new Dimension(0, 35));
+        
         setJMenuBar(menuBar);
         updateMenuStates();
     }
@@ -242,15 +265,18 @@ public class MainFrame extends JFrame {
     }
     
     public void initializeGame(GameBoard board, String puzzleName) {
-        if (gamePanel != null) {
-            remove(gamePanel);
+        if (puzzleNameLabel != null) {
+            puzzleNameLabel.setText(puzzleName);
         }
         
-        gamePanel = new GamePanel(board, controller, puzzleName);
-        add(gamePanel, BorderLayout.CENTER);
-        
-        pack();
-        setLocationRelativeTo(null);
+        if (gamePanel == null) {
+            gamePanel = new GamePanel(board, controller, puzzleName);
+            add(gamePanel, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+        } else {
+            gamePanel.updateGame(board, puzzleName);
+        }
         updateMenuStates();
     }
     
@@ -307,6 +333,14 @@ public class MainFrame extends JFrame {
     }
     
     public void updateLivesDisplay(int lives) {
+        if (menuLivesLabel != null) {
+            menuLivesLabel.setText("Lives: " + lives);
+            if (lives <= 1) {
+                menuLivesLabel.setForeground(Color.RED);
+            } else {
+                menuLivesLabel.setForeground(Color.BLACK);
+            }
+        }
         if (gamePanel != null) {
             gamePanel.updateLivesDisplay(lives);
         }

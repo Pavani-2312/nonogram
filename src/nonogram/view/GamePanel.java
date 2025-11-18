@@ -7,67 +7,68 @@ import nonogram.model.GameBoard;
 
 public class GamePanel extends JPanel {
     private GridPanel gridPanel;
-    private CluePanel rowCluePanel;
-    private CluePanel columnCluePanel;
     private GameBoard board;
     private String puzzleName;
     private JButton xButton;
     private JLabel livesLabel;
-    
+    private GameController controller;
+
     public GamePanel(GameBoard board, GameController controller, String puzzleName) {
+        this.controller = controller;
+        setLayout(new BorderLayout());
+        setupGame(board, puzzleName);
+    }
+
+    public void updateGame(GameBoard board, String puzzleName) {
+        removeAll();
+        setupGame(board, puzzleName);
+        revalidate();
+        repaint();
+    }
+
+    private void setupGame(GameBoard board, String puzzleName) {
         this.board = board;
         this.puzzleName = puzzleName;
-        setLayout(new BorderLayout());
-        
-        // Add puzzle title and lives at the top
-        JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel titleLabel = new JLabel(puzzleName, JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        livesLabel = new JLabel("Lives: 3", JLabel.RIGHT);
-        livesLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        livesLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        topPanel.add(titleLabel, BorderLayout.CENTER);
-        topPanel.add(livesLabel, BorderLayout.EAST);
-        add(topPanel, BorderLayout.NORTH);
-        
+
         gridPanel = new GridPanel(board, controller);
-        rowCluePanel = new CluePanel(board, true);
-        columnCluePanel = new CluePanel(board, false);
-        
+
         // Create X button
         xButton = new JButton("X");
-        xButton.setPreferredSize(new Dimension(25, 25));
-        xButton.setFont(new Font("Arial", Font.BOLD, 12));
+        xButton.setPreferredSize(new Dimension(50, 50));
+        xButton.setFont(new Font("SansSerif", Font.BOLD, 20));
         xButton.setMargin(new Insets(0, 0, 0, 0));
+        xButton.setFocusPainted(false);
+        xButton.setBorder(BorderFactory.createRaisedBevelBorder());
         xButton.addActionListener(e -> controller.toggleXMode());
-        
-        // Create main game panel with proper alignment
+
+        // Create main game panel with overlay
         JPanel mainGamePanel = new JPanel(new BorderLayout());
+        mainGamePanel.add(gridPanel, BorderLayout.CENTER);
         
-        // Create grid and column clues panel
-        JPanel gridAndColumnPanel = new JPanel(new BorderLayout());
-        gridAndColumnPanel.add(gridPanel, BorderLayout.CENTER);
-        gridAndColumnPanel.add(columnCluePanel, BorderLayout.SOUTH);
+        // Create overlay panel for floating button
+        JPanel overlayPanel = new JPanel();
+        overlayPanel.setOpaque(false);
+        overlayPanel.setLayout(null);
+        overlayPanel.add(xButton);
+        xButton.setBounds(10, 10, 50, 50);
         
-        // Create left panel with X button and row clues
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        JPanel xButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        xButtonPanel.add(xButton);
-        leftPanel.add(xButtonPanel, BorderLayout.WEST);
-        leftPanel.add(rowCluePanel, BorderLayout.CENTER);
+        // Use layered pane to overlay button
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(new BorderLayout());
+        layeredPane.add(mainGamePanel, BorderLayout.CENTER);
+        layeredPane.add(overlayPanel, BorderLayout.CENTER);
+        layeredPane.setLayer(mainGamePanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.setLayer(overlayPanel, JLayeredPane.PALETTE_LAYER);
         
-        // Add components with proper alignment
-        mainGamePanel.add(leftPanel, BorderLayout.WEST);
-        mainGamePanel.add(gridAndColumnPanel, BorderLayout.CENTER);
-        
-        // Center the entire game
-        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        centerWrapper.add(mainGamePanel);
-        
-        add(centerWrapper, BorderLayout.CENTER);
+        // Add resize listener
+        layeredPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                mainGamePanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+                overlayPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+            }
+        });
+
+        add(layeredPane, BorderLayout.CENTER);
         setBackground(Color.WHITE);
     }
     
