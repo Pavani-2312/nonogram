@@ -19,13 +19,11 @@ public class Main {
         controller.setView(view);
         view.setController(controller);
         
-        view.setVisible(true);
-        
-        // Ensure UI is fully rendered before starting game
         SwingUtilities.invokeLater(() -> {
             controller.startNewGame();
-            // Simulate clicking on Game menu to trigger UI refresh
-            view.getJMenuBar().getMenu(0).doClick();
+            view.pack();
+            view.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            view.setVisible(true);
         });
     }
 }
