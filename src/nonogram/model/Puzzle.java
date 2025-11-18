@@ -8,7 +8,7 @@ public class Puzzle {
     public Puzzle(String puzzleId, String name, boolean[][] solution) {
         this.puzzleId = puzzleId;
         this.name = name;
-        this.solution = solution;
+        this.solution = copyArray(solution);
     }
     
     public String getPuzzleId() {
@@ -20,7 +20,7 @@ public class Puzzle {
     }
     
     public boolean[][] getSolution() {
-        return solution;
+        return copyArray(solution);
     }
     
     public int getSize() {

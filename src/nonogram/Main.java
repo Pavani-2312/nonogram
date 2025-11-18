@@ -4,7 +4,6 @@ import nonogram.controller.GameController;
 import nonogram.view.MainFrame;
 
 import javax.swing.UIManager;
-import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,13 +18,7 @@ public class Main {
         controller.setView(view);
         view.setController(controller);
         
+        controller.startNewGame();
         view.setVisible(true);
-        
-        // Ensure UI is fully rendered before starting game
-        SwingUtilities.invokeLater(() -> {
-            controller.startNewGame();
-            // Simulate clicking on Game menu to trigger UI refresh
-            view.getJMenuBar().getMenu(0).doClick();
-        });
     }
 }

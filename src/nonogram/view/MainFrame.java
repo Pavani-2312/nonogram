@@ -272,12 +272,12 @@ public class MainFrame extends JFrame {
         if (gamePanel == null) {
             gamePanel = new GamePanel(board, controller, puzzleName);
             add(gamePanel, BorderLayout.CENTER);
+            revalidate();
+            repaint();
         } else {
             gamePanel.updateGame(board, puzzleName);
         }
         updateMenuStates();
-        revalidate();
-        repaint();
     }
     
     public void updateDisplay() {

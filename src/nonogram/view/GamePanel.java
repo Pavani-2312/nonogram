@@ -91,6 +91,11 @@ public class GamePanel extends JPanel {
     }
     
     public void updateLivesDisplay(int lives) {
-        // Lives display is handled in MainFrame menu bar
+        livesLabel.setText("Lives: " + lives);
+        if (lives <= 1) {
+            livesLabel.setForeground(Color.RED);
+        } else {
+            livesLabel.setForeground(Color.BLACK);
+        }
     }
 }
