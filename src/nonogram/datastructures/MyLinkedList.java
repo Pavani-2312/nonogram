@@ -2,6 +2,7 @@ package nonogram.datastructures;
 
 public class MyLinkedList<E> {
     private Node<E> head;
+    private Node<E> tail;
     private int size;
     
     private static class Node<E> {
@@ -16,19 +17,17 @@ public class MyLinkedList<E> {
     
     public MyLinkedList() {
         head = null;
+        tail = null;
         size = 0;
     }
     
     public void add(E element) {
         Node<E> newNode = new Node<>(element);
         if (head == null) {
-            head = newNode;
+            head = tail = newNode;
         } else {
-            Node<E> current = head;
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
+            tail.next = newNode;
+            tail = newNode;
         }
         size++;
     }

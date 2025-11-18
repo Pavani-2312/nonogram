@@ -3,15 +3,129 @@ package nonogram.controller;
 import nonogram.model.Puzzle;
 import nonogram.model.Difficulty;
 import nonogram.datastructures.MyLinkedList;
-import nonogram.datastructures.MyHashMap;
 
 public class PuzzleLoader {
     private MyLinkedList<Puzzle> puzzles;
-    private MyHashMap<Difficulty, MyLinkedList<Puzzle>> puzzlesByDifficulty;
+    private MyLinkedList<Puzzle> easyPuzzles;
+    private MyLinkedList<Puzzle> mediumPuzzles;
+    private MyLinkedList<Puzzle> hardPuzzles;
+    private MyLinkedList<Puzzle> expertPuzzles;
+    
+    // Pre-initialized static arrays
+    private static final boolean[][] HOUSE = {
+        {false,false,false,true,true,true,true,false,false,false},
+        {false,false,true,true,true,true,true,true,false,false},
+        {false,true,true,true,true,true,true,true,true,false},
+        {false,true,false,false,false,false,false,false,true,false},
+        {false,true,false,false,false,false,false,false,true,false},
+        {false,true,false,false,true,true,false,false,true,false},
+        {false,true,false,false,true,true,false,false,true,false},
+        {false,true,false,false,true,true,false,false,true,false},
+        {false,true,false,false,false,false,false,false,true,false},
+        {false,true,true,true,true,true,true,true,true,false}
+    };
+    
+    private static final boolean[][] TREE = {
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,true,true,true,true,false,false,false},
+        {false,false,true,true,true,true,true,true,false,false},
+        {false,true,true,true,true,true,true,true,true,false},
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,false,true,true,false,false,false,false},
+        {false,false,false,false,true,true,false,false,false,false}
+    };
+    
+    private static final boolean[][] STAR = {
+        {false,false,false,false,false,false,false,true,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,true,false,true,false,true,false,false,false,false,false},
+        {false,false,false,false,true,false,false,true,false,false,true,false,false,false,false},
+        {false,false,false,true,false,false,false,true,false,false,false,true,false,false,false},
+        {false,false,true,false,false,false,false,true,false,false,false,false,true,false,false},
+        {false,true,false,false,false,false,false,true,false,false,false,false,false,true,false},
+        {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
+        {false,true,false,false,false,false,false,true,false,false,false,false,false,true,false},
+        {false,false,true,false,false,false,false,true,false,false,false,false,true,false,false},
+        {false,false,false,true,false,false,false,true,false,false,false,true,false,false,false},
+        {false,false,false,false,true,false,false,true,false,false,true,false,false,false,false},
+        {false,false,false,false,false,true,false,true,false,true,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,true,false,false,false,false,false,false,false}
+    };
+    
+    private static final boolean[][] CASTLE = {
+        {false,false,false,false,false,false,true,false,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,false,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,true,true,true,true,true,true,true,false,false,false,false},
+        {false,false,false,false,true,true,true,true,true,true,true,false,false,false,false},
+        {false,false,false,false,true,true,true,false,true,true,true,false,false,false,false},
+        {false,false,false,false,true,true,true,false,true,true,true,false,false,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false}
+    };
+    
+    private static final boolean[][] DIAMOND = {
+        {false,false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,false,true,true,true,true,false,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,true,true,true,true,true,true,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,true,true,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false},
+        {false,false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false},
+        {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
+        {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
+        {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
+        {false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
+        {false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false},
+        {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false},
+        {false,false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false},
+        {false,false,false,false,false,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false},
+        {false,false,false,false,false,false,true,true,true,true,true,true,true,true,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,true,true,true,true,true,true,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,false,true,true,true,true,false,false,false,false,false,false,false,false},
+        {false,false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,false}
+    };
+    
+    private static final boolean[][] CHECKER = {
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
+        {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
+        {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true}
+    };
     
     public PuzzleLoader() {
         puzzles = new MyLinkedList<>();
-        puzzlesByDifficulty = new MyHashMap<>();
+        easyPuzzles = new MyLinkedList<>();
+        mediumPuzzles = new MyLinkedList<>();
+        hardPuzzles = new MyLinkedList<>();
+        expertPuzzles = new MyLinkedList<>();
         loadDefaultPuzzles();
     }
     
@@ -24,28 +138,28 @@ public class PuzzleLoader {
     }
     
     public MyLinkedList<Puzzle> getPuzzlesForDifficulty(Difficulty difficulty) {
-        return puzzlesByDifficulty.get(difficulty);
+        switch (difficulty) {
+            case EASY: return easyPuzzles;
+            case MEDIUM: return mediumPuzzles;
+            case HARD: return hardPuzzles;
+            case EXPERT: return expertPuzzles;
+            default: return easyPuzzles;
+        }
     }
     
     public int getPuzzleCount(Difficulty difficulty) {
-        MyLinkedList<Puzzle> difficultyPuzzles = puzzlesByDifficulty.get(difficulty);
-        return difficultyPuzzles != null ? difficultyPuzzles.size() : 0;
+        return getPuzzlesForDifficulty(difficulty).size();
     }
     
     public Puzzle getPuzzle(Difficulty difficulty, int index) {
-        MyLinkedList<Puzzle> difficultyPuzzles = puzzlesByDifficulty.get(difficulty);
-        if (difficultyPuzzles != null && index >= 0 && index < difficultyPuzzles.size()) {
+        MyLinkedList<Puzzle> difficultyPuzzles = getPuzzlesForDifficulty(difficulty);
+        if (index >= 0 && index < difficultyPuzzles.size()) {
             return difficultyPuzzles.get(index);
         }
         return null;
     }
     
     private void loadDefaultPuzzles() {
-        // Initialize difficulty maps
-        for (Difficulty diff : Difficulty.values()) {
-            puzzlesByDifficulty.put(diff, new MyLinkedList<>());
-        }
-        
         loadEasyPuzzles();
         loadMediumPuzzles();
         loadHardPuzzles();
@@ -95,133 +209,27 @@ public class PuzzleLoader {
     }
     
     private void loadMediumPuzzles() {
-        // 10x10 House puzzle - pre-calculated
-        boolean[][] house = {
-            {false,false,false,true,true,true,true,false,false,false},
-            {false,false,true,true,true,true,true,true,false,false},
-            {false,true,true,true,true,true,true,true,true,false},
-            {false,true,false,false,false,false,false,false,true,false},
-            {false,true,false,false,false,false,false,false,true,false},
-            {false,true,false,false,true,true,false,false,true,false},
-            {false,true,false,false,true,true,false,false,true,false},
-            {false,true,false,false,true,true,false,false,true,false},
-            {false,true,false,false,false,false,false,false,true,false},
-            {false,true,true,true,true,true,true,true,true,false}
-        };
-        addPuzzle(Difficulty.MEDIUM, new Puzzle("HOUSE", "House", house));
-        
-        // 10x10 Tree puzzle - pre-calculated
-        boolean[][] tree = {
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,true,true,true,true,false,false,false},
-            {false,false,true,true,true,true,true,true,false,false},
-            {false,true,true,true,true,true,true,true,true,false},
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,false,true,true,false,false,false,false},
-            {false,false,false,false,true,true,false,false,false,false}
-        };
-        addPuzzle(Difficulty.MEDIUM, new Puzzle("TREE", "Tree", tree));
+        addPuzzle(Difficulty.MEDIUM, new Puzzle("HOUSE", "House", HOUSE));
+        addPuzzle(Difficulty.MEDIUM, new Puzzle("TREE", "Tree", TREE));
     }
     
     private void loadHardPuzzles() {
-        // 15x15 Star puzzle - pre-calculated
-        boolean[][] star = {
-            {false,false,false,false,false,false,false,true,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,true,false,true,false,true,false,false,false,false,false},
-            {false,false,false,false,true,false,false,true,false,false,true,false,false,false,false},
-            {false,false,false,true,false,false,false,true,false,false,false,true,false,false,false},
-            {false,false,true,false,false,false,false,true,false,false,false,false,true,false,false},
-            {false,true,false,false,false,false,false,true,false,false,false,false,false,true,false},
-            {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
-            {false,true,false,false,false,false,false,true,false,false,false,false,false,true,false},
-            {false,false,true,false,false,false,false,true,false,false,false,false,true,false,false},
-            {false,false,false,true,false,false,false,true,false,false,false,true,false,false,false},
-            {false,false,false,false,true,false,false,true,false,false,true,false,false,false,false},
-            {false,false,false,false,false,true,false,true,false,true,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,true,false,false,false,false,false,false,false}
-        };
-        addPuzzle(Difficulty.HARD, new Puzzle("STAR", "Star Pattern", star));
-        
-        // 15x15 Castle puzzle - pre-calculated
-        boolean[][] castle = {
-            {false,false,false,false,false,false,true,false,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,false,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,true,true,true,true,true,true,true,false,false,false,false},
-            {false,false,false,false,true,true,true,true,true,true,true,false,false,false,false},
-            {false,false,false,false,true,true,true,false,true,true,true,false,false,false,false},
-            {false,false,false,false,true,true,true,false,true,true,true,false,false,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,false,false}
-        };
-        addPuzzle(Difficulty.HARD, new Puzzle("CASTLE", "Castle", castle));
+        addPuzzle(Difficulty.HARD, new Puzzle("STAR", "Star Pattern", STAR));
+        addPuzzle(Difficulty.HARD, new Puzzle("CASTLE", "Castle", CASTLE));
     }
     
     private void loadExpertPuzzles() {
-        // 20x20 Diamond puzzle - pre-calculated
-        boolean[][] diamond = {
-            {false,false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,false,true,true,true,true,false,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,true,true,true,true,true,true,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,true,true,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false},
-            {false,false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false},
-            {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
-            {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
-            {true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true},
-            {false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false},
-            {false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false},
-            {false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false},
-            {false,false,false,false,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false},
-            {false,false,false,false,false,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false},
-            {false,false,false,false,false,false,true,true,true,true,true,true,true,true,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,true,true,true,true,true,true,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,false,true,true,true,true,false,false,false,false,false,false,false,false},
-            {false,false,false,false,false,false,false,false,false,true,true,false,false,false,false,false,false,false,false,false}
-        };
-        addPuzzle(Difficulty.EXPERT, new Puzzle("DIAMOND", "Diamond Shape", diamond));
-        
-        // 20x20 Checkerboard puzzle - pre-calculated
-        boolean[][] checker = {
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true},
-            {true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false},
-            {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true}
-        };
-        addPuzzle(Difficulty.EXPERT, new Puzzle("CHECKER", "Checkerboard", checker));
+        addPuzzle(Difficulty.EXPERT, new Puzzle("DIAMOND", "Diamond Shape", DIAMOND));
+        addPuzzle(Difficulty.EXPERT, new Puzzle("CHECKER", "Checkerboard", CHECKER));
     }
     
     private void addPuzzle(Difficulty difficulty, Puzzle puzzle) {
         puzzles.add(puzzle);
-        puzzlesByDifficulty.get(difficulty).add(puzzle);
+        switch (difficulty) {
+            case EASY: easyPuzzles.add(puzzle); break;
+            case MEDIUM: mediumPuzzles.add(puzzle); break;
+            case HARD: hardPuzzles.add(puzzle); break;
+            case EXPERT: expertPuzzles.add(puzzle); break;
+        }
     }
 }

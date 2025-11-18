@@ -13,6 +13,7 @@ public class GameController {
     private int currentPuzzleIndex;
     private Difficulty currentDifficulty;
     private boolean xMode = false;
+    private MyLinkedList<Puzzle> currentDifficultyPuzzles;
     
     public GameController() {
         puzzleLoader = new PuzzleLoader();
@@ -25,6 +26,7 @@ public class GameController {
     }
     
     public void startNewGame() {
+        currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
         currentPuzzle = puzzleLoader.getPuzzle(currentDifficulty, 0);
         if (currentPuzzle == null) {
             currentPuzzle = puzzleLoader.getDefaultPuzzle();
@@ -133,7 +135,6 @@ public class GameController {
     }
     
     public void nextPuzzle() {
-        MyLinkedList<Puzzle> currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
         if (currentDifficultyPuzzles != null && currentPuzzleIndex < currentDifficultyPuzzles.size() - 1) {
             currentPuzzleIndex++;
             currentPuzzle = currentDifficultyPuzzles.get(currentPuzzleIndex);
@@ -144,7 +145,6 @@ public class GameController {
     public void previousPuzzle() {
         if (currentPuzzleIndex > 0) {
             currentPuzzleIndex--;
-            MyLinkedList<Puzzle> currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
             if (currentDifficultyPuzzles != null) {
                 currentPuzzle = currentDifficultyPuzzles.get(currentPuzzleIndex);
                 initializeGame();
@@ -187,6 +187,7 @@ public class GameController {
     public void setDifficulty(Difficulty difficulty) {
         currentDifficulty = difficulty;
         currentPuzzleIndex = 0;
+        currentDifficultyPuzzles = puzzleLoader.getPuzzlesForDifficulty(currentDifficulty);
         currentPuzzle = puzzleLoader.getPuzzle(difficulty, 0);
         if (currentPuzzle != null) {
             initializeGame();
