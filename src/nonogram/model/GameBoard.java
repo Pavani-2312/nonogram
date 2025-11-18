@@ -132,7 +132,7 @@ public class GameBoard {
         }
     }
     
-    public boolean isRowCluesSatisfied(int row, MyLinkedList<Integer> clues) {
+    private boolean isRowCluesSatisfied(int row, MyLinkedList<Integer> clues) {
         // Check if filled cells match the solution pattern
         for (int col = 0; col < cols; col++) {
             if (cells[row][col].getCurrentState() == CellState.FILLED) {
@@ -163,7 +163,7 @@ public class GameBoard {
         return cluesMatch(currentClues, clues);
     }
     
-    public boolean isColumnCluesSatisfied(int col, MyLinkedList<Integer> clues) {
+    private boolean isColumnCluesSatisfied(int col, MyLinkedList<Integer> clues) {
         // Check if filled cells match the solution pattern
         for (int row = 0; row < rows; row++) {
             if (cells[row][col].getCurrentState() == CellState.FILLED) {
