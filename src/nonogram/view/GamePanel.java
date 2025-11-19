@@ -34,27 +34,33 @@ public class GamePanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
         
         gridPanel = new GridPanel(board, controller);
-        rowCluePanel = new CluePanel(board, true);
-        columnCluePanel = new CluePanel(board, false);
+        int cellSize = gridPanel.getCellSize();
+        rowCluePanel = new CluePanel(board, true, cellSize);
+        columnCluePanel = new CluePanel(board, false, cellSize);
         
         // Create X button
         xButton = new JButton("X");
-        xButton.setPreferredSize(new Dimension(25, 25));
+        int buttonSize = Math.max(cellSize - 5, 25);
+        xButton.setPreferredSize(new Dimension(buttonSize, buttonSize));
         xButton.setFont(new Font("Arial", Font.BOLD, 12));
         xButton.setMargin(new Insets(0, 0, 0, 0));
         xButton.addActionListener(e -> controller.toggleXMode());
         
         // Create main game panel with proper alignment
         JPanel mainGamePanel = new JPanel(new BorderLayout());
+        mainGamePanel.setBackground(Color.WHITE);
         
         // Create grid and column clues panel
         JPanel gridAndColumnPanel = new JPanel(new BorderLayout());
+        gridAndColumnPanel.setBackground(Color.WHITE);
         gridAndColumnPanel.add(gridPanel, BorderLayout.CENTER);
         gridAndColumnPanel.add(columnCluePanel, BorderLayout.SOUTH);
         
         // Create left panel with X button and row clues
         JPanel leftPanel = new JPanel(new BorderLayout());
-        JPanel xButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.setBackground(Color.WHITE);
+        JPanel xButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+        xButtonPanel.setBackground(Color.WHITE);
         xButtonPanel.add(xButton);
         leftPanel.add(xButtonPanel, BorderLayout.WEST);
         leftPanel.add(rowCluePanel, BorderLayout.CENTER);
@@ -64,8 +70,13 @@ public class GamePanel extends JPanel {
         mainGamePanel.add(gridAndColumnPanel, BorderLayout.CENTER);
         
         // Center the entire game
-        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        centerWrapper.add(mainGamePanel);
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        centerWrapper.add(mainGamePanel, gbc);
         
         add(centerWrapper, BorderLayout.CENTER);
         setBackground(Color.WHITE);

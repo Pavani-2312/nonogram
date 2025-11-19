@@ -21,7 +21,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setLayout(new BorderLayout());
-        setSize(1000, 800);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         createMenuBar();
     }
     
@@ -249,7 +249,8 @@ public class MainFrame extends JFrame {
         gamePanel = new GamePanel(board, controller, puzzleName);
         add(gamePanel, BorderLayout.CENTER);
         
-        pack();
+        revalidate();
+        repaint();
         setLocationRelativeTo(null);
         updateMenuStates();
     }

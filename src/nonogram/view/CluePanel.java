@@ -8,26 +8,28 @@ import nonogram.datastructures.MyLinkedList;
 public class CluePanel extends JPanel {
     private GameBoard board;
     private boolean isRowClues;
-    private static final int CELL_SIZE = 30;
+    private int cellSize;
     
-    public CluePanel(GameBoard board, boolean isRowClues) {
+    public CluePanel(GameBoard board, boolean isRowClues, int cellSize) {
         this.board = board;
         this.isRowClues = isRowClues;
+        this.cellSize = cellSize;
         
         if (isRowClues) {
-            setPreferredSize(new Dimension(80, board.getRows() * CELL_SIZE));
+            setPreferredSize(new Dimension(cellSize * 2, board.getRows() * cellSize));
         } else {
-            setPreferredSize(new Dimension(board.getCols() * CELL_SIZE, 60));
+            setPreferredSize(new Dimension(board.getCols() * cellSize, cellSize * 2));
         }
         
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(Color.WHITE);
     }
     
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 12));
+        int fontSize = Math.max(cellSize / 3, 12);
+        g.setFont(new Font("Arial", Font.BOLD, fontSize));
         
         if (isRowClues) {
             drawRowClues(g);
@@ -50,11 +52,11 @@ public class CluePanel extends JPanel {
             }
             
             // Align exactly with the grid row center
-            int y = startY + row * CELL_SIZE + CELL_SIZE / 2 + 5;
+            int y = startY + row * cellSize + cellSize / 2 + (cellSize / 8);
             // Right-align the text
             FontMetrics fm = g.getFontMetrics();
             int textWidth = fm.stringWidth(clueText.toString());
-            int x = getWidth() - textWidth - 8;
+            int x = getWidth() - textWidth - (cellSize / 8);
             
             g.drawString(clueText.toString(), x, y);
         }
@@ -65,8 +67,9 @@ public class CluePanel extends JPanel {
             MyLinkedList<Integer> clues = board.getColumnClues(col);
             
             // Center horizontally with the grid column
-            int x = col * CELL_SIZE + CELL_SIZE / 2;
-            int y = 15;
+            int x = col * cellSize + cellSize / 2;
+            int y = Math.max(cellSize / 4, 15);
+            int lineSpacing = Math.max(cellSize / 3, 18);
             
             // Draw each clue number vertically
             for (int i = 0; i < clues.size(); i++) {
@@ -75,7 +78,7 @@ public class CluePanel extends JPanel {
                 int textWidth = fm.stringWidth(clueStr);
                 
                 // Center the text horizontally
-                g.drawString(clueStr, x - textWidth / 2, y + i * 18);
+                g.drawString(clueStr, x - textWidth / 2, y + i * lineSpacing);
             }
         }
     }

@@ -12,7 +12,7 @@ import nonogram.model.CellState;
 public class GridPanel extends JPanel {
     private GameBoard board;
     private GameController controller;
-    private static final int CELL_SIZE = 30;
+    private int cellSize;
     private int wrongRow = -1;
     private int wrongCol = -1;
     
@@ -20,16 +20,27 @@ public class GridPanel extends JPanel {
         this.board = board;
         this.controller = controller;
         
-        int width = board.getCols() * CELL_SIZE;
-        int height = board.getRows() * CELL_SIZE;
+        // Calculate dynamic cell size based on screen dimensions
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int maxWidth = (int)(screenSize.width * 0.6); // 60% of screen width for grid
+        int maxHeight = (int)(screenSize.height * 0.7); // 70% of screen height for grid
+        
+        int cellSizeByWidth = maxWidth / board.getCols();
+        int cellSizeByHeight = maxHeight / board.getRows();
+        this.cellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
+        this.cellSize = Math.max(this.cellSize, 30); // Minimum 30px
+        
+        int width = board.getCols() * cellSize;
+        int height = board.getRows() * cellSize;
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.WHITE);
+        setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = e.getY() / CELL_SIZE;
-                int col = e.getX() / CELL_SIZE;
+                int row = e.getY() / cellSize;
+                int col = e.getX() / cellSize;
                 
                 if (row >= 0 && row < board.getRows() && col >= 0 && col < board.getCols()) {
                     controller.handleCellClick(row, col);
@@ -51,44 +62,48 @@ public class GridPanel extends JPanel {
         
         // Draw grid lines
         g.setColor(Color.BLACK);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setStroke(new BasicStroke(2)); // Thicker lines for visibility
+        
         // Horizontal lines
         for (int i = 0; i <= board.getRows(); i++) {
-            g.drawLine(0, i * CELL_SIZE, board.getCols() * CELL_SIZE, i * CELL_SIZE);
+            g2d.drawLine(0, i * cellSize, board.getCols() * cellSize, i * cellSize);
         }
         // Vertical lines
         for (int i = 0; i <= board.getCols(); i++) {
-            g.drawLine(i * CELL_SIZE, 0, i * CELL_SIZE, board.getRows() * CELL_SIZE);
+            g2d.drawLine(i * cellSize, 0, i * cellSize, board.getRows() * cellSize);
         }
     }
     
     private void drawCell(Graphics g, int row, int col) {
         Cell cell = board.getCell(row, col);
-        int x = col * CELL_SIZE;
-        int y = row * CELL_SIZE;
+        int x = col * cellSize;
+        int y = row * cellSize;
         
         // Check if this is the wrong move cell
         if (row == wrongRow && col == wrongCol) {
             g.setColor(Color.RED);
-            g.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+            g.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
             return;
         }
         
         switch (cell.getCurrentState()) {
             case UNKNOWN:
                 g.setColor(Color.WHITE);
-                g.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                g.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
                 break;
             case FILLED:
                 g.setColor(Color.BLACK);
-                g.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                g.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
                 break;
             case MARKED:
                 g.setColor(Color.WHITE);
-                g.fillRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+                g.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
                 g.setColor(Color.RED);
                 // Draw X mark
-                g.drawLine(x + 8, y + 8, x + CELL_SIZE - 8, y + CELL_SIZE - 8);
-                g.drawLine(x + 8, y + CELL_SIZE - 8, x + CELL_SIZE - 8, y + 8);
+                int margin = cellSize / 6;
+                g.drawLine(x + margin, y + margin, x + cellSize - margin, y + cellSize - margin);
+                g.drawLine(x + margin, y + cellSize - margin, x + cellSize - margin, y + margin);
                 break;
         }
     }
@@ -105,5 +120,9 @@ public class GridPanel extends JPanel {
         });
         timer.setRepeats(false);
         timer.start();
+    }
+    
+    public int getCellSize() {
+        return cellSize;
     }
 }
