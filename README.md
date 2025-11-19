@@ -41,8 +41,24 @@ nonogram/
 ```
 
 ### Running the Game
+
+**Linux/Mac:**
 ```bash
+./run.sh
+```
+
+**Windows:**
+```cmd
+run.bat
+```
+
+**Manual execution (if scripts don't work):**
+```bash
+# Try this first
 java -cp bin nonogram.Main
+
+# If display issues occur, use compatibility flags:
+java -Djava.awt.headless=false -Dsun.java2d.xrender=false -Dsun.java2d.pmoffscreen=false -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -cp bin nonogram.Main
 ```
 
 ## How to Play

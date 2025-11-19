@@ -19,9 +19,8 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Nonogram Puzzle Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(true);
+        setSize(1500, 600);
         setLayout(new BorderLayout());
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         createMenuBar();
     }
     
@@ -251,6 +250,7 @@ public class MainFrame extends JFrame {
         
         revalidate();
         repaint();
+        pack();
         setLocationRelativeTo(null);
         updateMenuStates();
     }
