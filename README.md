@@ -42,23 +42,18 @@ nonogram/
 
 ### Running the Game
 
-**Linux/Mac:**
-```bash
-./run.sh
-```
-
 **Windows:**
 ```cmd
 run.bat
 ```
 
-**Manual execution (if scripts don't work):**
+**Manual execution:**
 ```bash
-# Try this first
-java -cp bin nonogram.Main
+# Compile first
+./compile.sh
 
-# If display issues occur, use compatibility flags:
-java -Djava.awt.headless=false -Dsun.java2d.xrender=false -Dsun.java2d.pmoffscreen=false -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -cp bin nonogram.Main
+# Run with display compatibility flags (required for WSL/Linux environments):
+java -Djava.awt.headless=false -Dsun.java2d.xrender=false -Dsun.java2d.pmoffscreen=false -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dsun.java2d.noddraw=true -cp bin nonogram.Main
 ```
 
 ## How to Play
