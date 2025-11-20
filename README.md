@@ -10,12 +10,21 @@ nonogram/
 │   ├── Main.java          # Application entry point
 │   ├── datastructures/    # Custom data structures
 │   │   ├── MyLinkedList.java
-│   │   └── MyStack.java
+│   │   ├── MyStack.java
+│   │   ├── MyArrayList.java
+│   │   ├── MyQueue.java
+│   │   └── MyHashMap.java
 │   ├── model/             # Game logic and data
 │   │   ├── CellState.java
 │   │   ├── Cell.java
+│   │   ├── CellPosition.java
 │   │   ├── GameBoard.java
-│   │   └── Puzzle.java
+│   │   ├── GameState.java
+│   │   ├── Puzzle.java
+│   │   ├── Difficulty.java
+│   │   ├── Move.java
+│   │   ├── Hint.java
+│   │   └── HintType.java
 │   ├── view/              # User interface
 │   │   ├── MainFrame.java
 │   │   ├── GamePanel.java
@@ -23,7 +32,8 @@ nonogram/
 │   │   └── CluePanel.java
 │   └── controller/        # Game coordination
 │       ├── GameController.java
-│       └── PuzzleLoader.java
+│       ├── PuzzleLoader.java
+│       └── HintGenerator.java
 ├── bin/                   # Compiled classes
 ├── docs/                  # Documentation
 ├── compile.sh            # Compilation script
@@ -68,20 +78,30 @@ java -Djava.awt.headless=false -Dsun.java2d.xrender=false -Dsun.java2d.pmoffscre
 
 ## Features Implemented
 
-- ✅ Custom data structures (MyLinkedList, MyStack with linked nodes)
+- ✅ Custom data structures (MyLinkedList, MyStack, MyArrayList, MyQueue, MyHashMap)
 - ✅ MVC architecture
 - ✅ Interactive grid with mouse controls
 - ✅ Clue display for rows and columns
 - ✅ Win detection
 - ✅ Multiple built-in puzzles (Heart, Cross, Square)
 - ✅ Cell state cycling (Unknown → Filled → Marked)
+- ✅ Hint system with multiple hint types
+- ✅ Game state management and move tracking
+- ✅ Multiple difficulty levels
+- ✅ Cell position tracking
 
 ## Game Architecture
 
 ### Model Layer
 - **Cell**: Individual grid cell with state and solution
+- **CellPosition**: Represents cell coordinates (row, column)
 - **GameBoard**: Complete puzzle grid with clues
-- **Puzzle**: Puzzle definition with solution
+- **GameState**: Manages current game state and move history
+- **Puzzle**: Puzzle definition with solution and difficulty
+- **Move**: Represents player moves for undo functionality
+- **Hint**: Hint data structure with type and target
+- **HintType**: Enumeration of available hint types
+- **Difficulty**: Puzzle difficulty levels
 
 ### View Layer
 - **MainFrame**: Main application window
@@ -92,10 +112,14 @@ java -Djava.awt.headless=false -Dsun.java2d.xrender=false -Dsun.java2d.pmoffscre
 ### Controller Layer
 - **GameController**: Coordinates game logic and UI
 - **PuzzleLoader**: Manages puzzle data
+- **HintGenerator**: Generates hints for players
 
 ### Custom Data Structures
 - **MyLinkedList**: Dynamic linked list for clue storage
 - **MyStack**: Proper stack implementation with linked nodes (ready for undo functionality)
+- **MyArrayList**: Dynamic array implementation
+- **MyQueue**: Queue data structure for game processing
+- **MyHashMap**: Hash map for efficient data storage
 
 ## Default Puzzles
 
